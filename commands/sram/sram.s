@@ -16,7 +16,7 @@ rjmp loop1
 
 
 printValue:
-ld r25, Y
+ld r21, Y
 rcall uartSendHex
 ret
 
