@@ -58,8 +58,6 @@ cpi r19, 1
 breq abort
 add YL, r18
 adc YH, r1
-ldi r29, 0x12
-ldi r28, 0x34
 ret
 
 
