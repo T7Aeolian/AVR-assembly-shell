@@ -85,19 +85,24 @@ ret
 
 
 isValidChar:
+cpi r18, 0x61
+brsh lowerLetterRangeLowercase
 cpi r18, 0x30
 brsh lowerDigitRange
-letterCheck:
 cpi r18, 0x41
-brsh lowerLetterRange
+brsh lowerLetterRangeUppercase
 rjmp invalidChar
 lowerDigitRange:
 cpi r18, 0x3A
 brlo validDigit
-rjmp letterCheck
-lowerLetterRange:
+rjmp invalidChar
+lowerLetterRangeLowercase:
+cpi r18, 0x67
+brlo validLetterLowercase
+rjmp invalidChar
+lowerLetterRangeUppercase:
 cpi r18, 0x47
-brlo validLetter
+brlo validLetterUppercase
 rjmp invalidChar
 
 
@@ -105,8 +110,13 @@ validDigit:
 subi r18, 0x30
 ret
 
-validLetter:
+validLetterUppercase:
 subi r18, 0x37
+ret
+
+
+validLetterLowercase:
+subi r18, 0x57
 ret
 
 

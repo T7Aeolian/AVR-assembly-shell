@@ -67,16 +67,16 @@ cp r0, r17
 breq callClearCommand
 ldi r17, 112
 cp r0, r17
-breq callSramHelp
-ldi r17, 240
-cp r0, r17
-breq callEchoCommand
+breq callIjmp
 ldi r17, 128
 cp r0, r17
 breq callMread
 ldi r17, 192
 cp r0, r17
 breq callMwrite
+ldi r17, 240
+cp r0, r17
+breq callEchoCommand
 ldi r17, 254
 cp r0, r17
 breq returnCase
@@ -100,15 +100,14 @@ ret
 callEchoCommand:
 rcall echoCommand
 ret
-callSramHelp:
-rcall sramHelp
-ret
 callMread:
 rcall mread
 ret
 callMwrite:
 rcall mwrite
 ret
+callIjmp:
+ijmp
 
 
 setZCommandNotFound:

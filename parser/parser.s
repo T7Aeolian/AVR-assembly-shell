@@ -79,6 +79,17 @@ mov r28, r13
 rjmp done
 
 
+ijmpADDR:
+ldi r17, 2
+rcall ahtoi
+cpi r19, 0
+brne invalidArgument
+movw Z, Y
+lsr ZH
+ror ZL
+rjmp done
+
+
 invalidArgument:
 ldi r20, 253
 mov r0, r20
@@ -104,12 +115,14 @@ cpi r19, 1
 breq mreadADDR
 rjmp invalidCommand
 
+
 char9:
 ldi r20, 112
-rcall setZHelpSram
-rcall compareString
+rcall setZIndirectJump
+ldi r16, 5
+rcall noRestoreBL
 cpi r19, 1
-breq done
+breq ijmpADDR
 rjmp invalidCommand
 
 
@@ -223,9 +236,9 @@ ldi ZL, lo8(echo)
 ret
 
 
-setZHelpSram:
-ldi ZH, hi8(helpSram)
-ldi ZL, lo8(helpSram)
+setZIndirectJump:
+ldi ZH, hi8(indirectJump)
+ldi ZL, lo8(indirectJump)
 ret
 
 
@@ -254,7 +267,6 @@ ret
 
 
 help: .ascii "help"
-helpSram: .ascii "help sram"
 info: .ascii "info"
 regs: .ascii "regs"
 clear: .ascii "clear"
@@ -263,3 +275,4 @@ echo: .ascii "echo"
 mread: .ascii "mread " 
 mwrite: .ascii "mwrite "
 space: .ascii " "
+indirectJump: .ascii "ijmp "
