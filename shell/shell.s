@@ -74,6 +74,9 @@ breq callEchoCommand
 ldi r17, 128
 cp r0, r17
 breq callMread
+ldi r17, 192
+cp r0, r17
+breq callMwrite
 ldi r17, 254
 cp r0, r17
 breq returnCase
@@ -102,6 +105,9 @@ rcall sramHelp
 ret
 callMread:
 rcall mread
+ret
+callMwrite:
+rcall mwrite
 ret
 
 

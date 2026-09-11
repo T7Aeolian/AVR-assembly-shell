@@ -14,21 +14,25 @@
 parseCommand:		; select case based on command length
 rcall restoreBL
 cpi r16, 4
-brne NotChar4
+brne notChar4
 rjmp char4
-NotChar4:
+notChar4:
 cpi r16, 5
-brne NotChar5
+brne notChar5
 rjmp char5
-NotChar5:
+notChar5:
 cpi r16, 9
-brne NotChar9
+brne notChar9
 rjmp char9
-NotChar9:
+notChar9:
 cpi r16, 10
-brne NotChar10
+brne notChar10
 rjmp char10
-NotChar10:
+notChar10:
+cpi r16, 14
+brne notChar14
+rjmp char14
+notChar14:
 rjmp variableLength
 
 
@@ -50,12 +54,45 @@ rcall ahtoi
 cpi r19, 0
 brne invalidArgument
 rjmp done
+mwriteADDR:
+ldi r17, 2
+rcall ahtoi
+cpi r19, 0
+brne invalidArgument
+rjmp mwriteADDR0
+mwriteADDR0:
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+brne invalidArgument
+rjmp mwriteADDR0VV
+mwriteADDR0VV:
+mov r12, r29
+mov r13, r28
+ldi r17, 1
+rcall ahtoi
+cpi r19, 0
+brne invalidArgument
+mov r29, r12
+mov r28, r13
+rjmp done
 
 
 invalidArgument:
 ldi r20, 253
 mov r0, r20
 ret 
+
+
+char14:
+ldi r20, 192
+rcall setZMwrite
+ldi r16, 7
+rcall noRestoreBL
+cpi r19, 1
+breq mwriteADDR
+rjmp invalidCommand
 
 
 char10:
@@ -204,9 +241,9 @@ ldi ZL, lo8(mread)
 ret
 
 
-setZEmptyByte:
-ldi ZH, hi8(emptyByte)
-ldi ZL, lo8(emptyByte)
+setZSpace:
+ldi ZH, hi8(space)
+ldi ZL, lo8(space)
 ret
 
 
@@ -224,5 +261,5 @@ clear: .ascii "clear"
 echo0: .ascii "echo "
 echo: .ascii "echo"
 mread: .ascii "mread " 
-mwrite: .ascii "mwrite"
-emptyByte: .byte 0
+mwrite: .ascii "mwrite "
+space: .ascii " "

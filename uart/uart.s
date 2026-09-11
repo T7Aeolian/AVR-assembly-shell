@@ -78,8 +78,6 @@ rcall high_hex
 rcall resetZHex
 rcall low_hex
 rcall resetZHex
-ldi r25, ' '
-rcall uartSend
 ret
 
 
