@@ -71,9 +71,9 @@ breq callSramHelp
 ldi r17, 240
 cp r0, r17
 breq callEchoCommand
-ldi r17, 241
+ldi r17, 128
 cp r0, r17
-breq callSramRead
+breq callMread
 ldi r17, 254
 cp r0, r17
 breq returnCase
@@ -100,8 +100,8 @@ ret
 callSramHelp:
 rcall sramHelp
 ret
-callSramRead:
-rcall sramRead
+callMread:
+rcall mread
 ret
 
 
@@ -127,7 +127,7 @@ ret
 
 printBuffer:
 rcall resetXBuffer
-rcall setYBL
+rcall getBL
 loop1:
 cpi r16, 0
 breq done1

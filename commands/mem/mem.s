@@ -1,11 +1,11 @@
-.global sramRead
+.global mread
 
-; sramRead - display value of address Y in sram
+; mread - display value of address Y in memory
 
 .text
 
 
-sramRead:
+mread:
 rcall setZReadMessage
 loop1:
 lpm r25, Z+

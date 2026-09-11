@@ -25,6 +25,10 @@ cpi r16, 9
 brne NotChar9
 rjmp char9
 NotChar9:
+cpi r16, 10
+brne NotChar10
+rjmp char10
+NotChar10:
 rjmp variableLength
 
 
@@ -37,16 +41,10 @@ cpi r19, 1
 brne notEcho
 rjmp done
 notEcho:
-rcall setZSramRead0x
-ldi r16, 12
-rcall noRestoreBL
-cpi r19, 1
-breq sramRead0xADDR
-notSramRead0x:
 rjmp invalidCommand
 
 
-sramRead0xADDR:
+mreadADDR:
 ldi r17, 2
 rcall ahtoi
 cpi r19, 0
@@ -59,6 +57,15 @@ ldi r20, 253
 mov r0, r20
 ret 
 
+
+char10:
+ldi r20, 128
+rcall setZMread
+ldi r16, 6
+rcall noRestoreBL
+cpi r19, 1
+breq mreadADDR
+rjmp invalidCommand
 
 char9:
 ldi r20, 112
@@ -185,21 +192,15 @@ ldi ZL, lo8(helpSram)
 ret
 
 
-setZSramWrite0x:
-ldi ZH, hi8(sramWrite0x)
-ldi ZL, lo8(sramWrite0x)
+setZMwrite:
+ldi ZH, hi8(mwrite)
+ldi ZL, lo8(mwrite)
 ret
 
 
-setZSramRead0x:
-ldi ZH, hi8(sramRead0x)
-ldi ZL, lo8(sramRead0x)
-ret
-
-
-setZHexStart:
-ldi ZH, hi8(hexStart)
-ldi ZL, lo8(hexStart)
+setZMread:
+ldi ZH, hi8(mread)
+ldi ZL, lo8(mread)
 ret
 
 
@@ -222,7 +223,6 @@ regs: .ascii "regs"
 clear: .ascii "clear"
 echo0: .ascii "echo "
 echo: .ascii "echo"
-sramRead0x: .ascii "sram read 0x" 
-sramWrite0x: .ascii "sram write 0x"
-hexStart: .ascii " 0x"
+mread: .ascii "mread " 
+mwrite: .ascii "mwrite"
 emptyByte: .byte 0

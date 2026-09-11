@@ -74,14 +74,8 @@ ret
 
 uartSendHex:		; send r21 byte as hex string
 clr r1
-ldi r25, '0'
-rcall uartSend
-ldi r25, 'x'
-rcall uartSend
-ldi r22, 0x01
 rcall high_hex
 rcall resetZHex
-ldi r22, 0x01
 rcall low_hex
 rcall resetZHex
 ldi r25, ' '

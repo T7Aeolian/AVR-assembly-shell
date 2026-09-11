@@ -84,6 +84,7 @@ rcall uartSend
 rjmp loop1
 done1:
 rcall terminalEnter
+eor r25, r25
 ret
 
 
