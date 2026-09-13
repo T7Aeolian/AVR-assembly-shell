@@ -65,26 +65,24 @@ breq callRegsCommand
 ldi r17, 48
 cp r0, r17
 breq callClearCommand
-ldi r17, 112
+ldi r17, 241
 cp r0, r17
 breq callIjmp
-ldi r17, 128
+ldi r17, 242
 cp r0, r17
 breq callMread
-ldi r17, 192
+ldi r17, 243
 cp r0, r17
 breq callMwrite
 ldi r17, 240
 cp r0, r17
 breq callEchoCommand
-ldi r17, 254
+ldi r17, 253
 cp r0, r17
-breq returnCase
+breq callInvalidArg
 rjmp invalidCommand
 
 
-returnCase:
-ret
 callHelpCommand:
 rcall helpCommand
 ret
@@ -108,6 +106,9 @@ rcall mwrite
 ret
 callIjmp:
 ijmp
+callInvalidArg:
+rcall printInvalidArg
+ret
 
 
 setZCommandNotFound:
@@ -144,7 +145,25 @@ done1:
 ret
 
 
-commandNotFound: .asciz "ERROR: Command not found: "
+printInvalidArg:
+rcall setZInvalidArg
+loop3:
+lpm r25, Z+
+cpi r25, 0
+breq done3
+rcall uartSend
+rjmp loop3
+done3:
+ret
 
+
+setZInvalidArg:
+ldi ZH, hi8(invalidArg)
+ldi ZL, lo8(invalidArg)
+ret
+
+
+commandNotFound: .asciz "ERROR: Command not found: "
+invalidArg: .asciz "ERROR: Invalid argument/s provided"
 
 .align 1

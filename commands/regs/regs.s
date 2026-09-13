@@ -74,12 +74,10 @@ rjmp r22
 rjmp r23
 rjmp r24
 rjmp r25
-rjmp r26
-rjmp r27
-rjmp r28
-rjmp r29
-rjmp r30
-rjmp r31
+rjmp X
+rjmp Y
+rjmp Z
+rjmp PC
 rjmp SP
 
 
@@ -166,24 +164,29 @@ rjmp shortcut
 r25:
 mov r21, r25
 rjmp shortcut
-r26:
+X:
+mov r21, r27
+rcall uartSendHex
 mov r21, r26
 rjmp shortcut
-r27:
-mov r21, r27
-rjmp shortcut
-r28:
+Y:
+mov r21, r29
+rcall uartSendHex
 mov r21, r28
 rjmp shortcut
-r29:
-mov r21, r29
-rjmp shortcut
-r30:
+Z:
+mov r21, r31
+rcall uartSendHex
 mov r21, r30
 rjmp shortcut
-r31:
-mov r21, r31
-rjmp shortcut
+PC:
+rcall .+0
+pop r17
+pop r18
+mov r21, r18
+rcall uartSendHex
+mov r21, r17
+rjmp shortcut 
 SP:
 lds r21, 0x5E
 rcall uartSendHex
@@ -198,6 +201,6 @@ ldi ZL, lo8(regsMessage)
 ret
 
 
-regsMessage: .asciz "r0:0x\n r1:0x\n r2:0x\n r3:0x\n r4:0x\n r5:0x\n\rr6:0x\n r7:0x\n r8:0x\n r9:0x\n r10:0x\n r11:0x\n\rr12:0x\n r13:0x\n r14:0x\n r15:0x\n r16:0x\n r17:0x\n\rr18:0x\n r19:0x\n r20:0x\n r21:0x\n r22:0x\n r23:0x\n\rr24:0x\n r25:0x\n r26:0x\n r27:0x\n r28:0x\n r29:0x\n\rr30:0x\n r31:0x\n SP:0x\n"
+regsMessage: .asciz "r0:0x\n r1:0x\n r2:0x\n r3:0x\n r4:0x\n r5:0x\n\rr6:0x\n r7:0x\n r8:0x\n r9:0x\n r10:0x\n r11:0x\n\rr12:0x\n r13:0x\n r14:0x\n r15:0x\n r16:0x\n r17:0x\n\rr18:0x\n r19:0x\n r20:0x\n r21:0x\n r22:0x\n r23:0x\n\rr24:0x\n r25:0x\n X:0x\n Y:0x\n Z:0x\n PC:0x\n\rSP:0x\n"
 
 .align 1

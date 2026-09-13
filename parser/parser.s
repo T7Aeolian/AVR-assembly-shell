@@ -13,6 +13,8 @@
 
 parseCommand:		; select case based on command length
 rcall restoreBL
+rjmp variableLength
+notVariableLength:
 cpi r16, 4
 brne notChar4
 rjmp char4
@@ -21,39 +23,206 @@ cpi r16, 5
 brne notChar5
 rjmp char5
 notChar5:
-cpi r16, 9
-brne notChar9
-rjmp char9
-notChar9:
-cpi r16, 10
-brne notChar10
-rjmp char10
-notChar10:
-cpi r16, 14
-brne notChar14
-rjmp char14
-notChar14:
-rjmp variableLength
+rjmp invalidCommand
 
 
 variableLength:		; variable length commands
 ldi r20, 240
-rcall setZEcho0
-ldi r16, 5
+rcall setZEcho
+ldi r16, 4
 rcall noRestoreBL
 cpi r19, 1
 brne notEcho
-rjmp done
+rjmp isEcho
 notEcho:
+rcall restoreBL
+rcall setZIndirectJump
+ldi r16, 4
+rcall noRestoreBL
+cpi r19, 1
+brne notIjmp
+rjmp isIjmp
+notIjmp:
+rcall restoreBL
+rcall setZMread
+ldi r16, 5
+rcall noRestoreBL
+cpi r19, 1
+brne notMread
+rjmp isMread
+notMread:
+rcall restoreBL
+rcall setZMwrite
+ldi r16, 6
+rcall noRestoreBL
+cpi r19, 1
+brne notMwrite
+rjmp isMwrite
+notMwrite:
+rcall restoreBL
+rjmp notVariableLength
+
+
+isMwrite:
+rcall restoreBL
+cpi r16, 6
+brne mwriteNot6
+rjmp invalidArgument
+mwriteNot6:
+cpi r16, 7
+brne mwriteNot7
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq mwrite7Valid
 rjmp invalidCommand
+mwrite7Valid:
+rjmp invalidArgument
+mwriteNot7:
+rcall setZSpace
+ldi r16, 1
+rcall check
+breq mwrite0
+rjmp invalidCommand
+mwrite0:
+ldi r17, 2
+rcall ahtoi
+tst r19
+brne mwriteADDRInvalid
+rjmp mwriteRange
+mwriteADDRInvalid:
+rjmp invalidArgument
+mwriteRange:
+cpi r29, 0x09
+brlo mwriteADDRValid
+rjmp invalidArgument
+mwriteADDRValid:
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq mwriteADDRValid0
+rjmp invalidArgument
+mwriteADDRValid0:
+mov r12, r28
+mov r13, r29
+ldi r17, 1
+rcall ahtoi
+mov r28, r12
+mov r29, r13
+tst r19
+brne mwriteADDR0VALUEInvalid
+rjmp done
+mwriteADDR0VALUEInvalid:
+rjmp invalidArgument
 
 
+isMread:
+rcall restoreBL
+cpi r16, 5
+brne mreadNot5
+rjmp invalidArgument
+mreadNot5:
+cpi r16, 6
+brne mreadNot6
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq mread6Valid
+rjmp invalidCommand
+mread6Valid:
+rjmp invalidArgument
+mreadNot6:
+cpi r16, 10
+brne mreadNot10
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq mreadADDR
+rjmp invalidCommand
+mreadNot10:
+rjmp invalidArgument
 mreadADDR:
 ldi r17, 2
 rcall ahtoi
-cpi r19, 0
-brne invalidArgument
+tst r19
+brne mreadADDRInvalid
+rjmp mreadRange
+mreadADDRInvalid:
+rjmp invalidArgument
+mreadRange:
+cpi r29, 0x09
+brlo mreadValid
+rjmp invalidArgument
+mreadValid:
 rjmp done
+
+
+isIjmp:
+rcall restoreBL
+cpi r16, 4
+brne ijmpNot4
+rjmp invalidArgument
+ijmpNot4:
+cpi r16, 5
+brne ijmpNot5
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq ijmp5Valid
+rjmp invalidCommand
+ijmp5Valid:
+rjmp invalidArgument
+ijmpNot5:
+cpi r16, 9
+brne ijmpNot9
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq ijmpADDR
+rjmp invalidCommand
+ijmpNot9:
+rjmp invalidArgument
+ijmpADDR:
+ldi r17, 2
+rcall ahtoi
+tst r19
+brne ijmpADDRInvalid
+movw Z, Y
+rjmp ijmpRange
+ijmpADDRInvalid:
+rjmp invalidArgument
+ijmpRange:
+cpi r31, 0x80
+brlo ijmpValid
+rjmp invalidArgument
+ijmpValid:
+lsr ZH
+ror ZL
+rjmp done
+
+
+isEcho:
+rcall restoreBL
+cpi r16, 4
+brne echoNot4
+rjmp done
+echoNot4:
+rcall setZSpace
+ldi r16, 1
+rcall check
+cpi r19, 1
+breq correctSyn
+rjmp invalidCommand
+correctSyn:
+rjmp done
+
+
 mwriteADDR:
 ldi r17, 2
 rcall ahtoi
@@ -79,51 +248,10 @@ mov r28, r13
 rjmp done
 
 
-ijmpADDR:
-ldi r17, 2
-rcall ahtoi
-cpi r19, 0
-brne invalidArgument
-movw Z, Y
-lsr ZH
-ror ZL
-rjmp done
-
-
 invalidArgument:
 ldi r20, 253
 mov r0, r20
-ret 
-
-
-char14:
-ldi r20, 192
-rcall setZMwrite
-ldi r16, 7
-rcall noRestoreBL
-cpi r19, 1
-breq mwriteADDR
-rjmp invalidCommand
-
-
-char10:
-ldi r20, 128
-rcall setZMread
-ldi r16, 6
-rcall noRestoreBL
-cpi r19, 1
-breq mreadADDR
-rjmp invalidCommand
-
-
-char9:
-ldi r20, 112
-rcall setZIndirectJump
-ldi r16, 5
-rcall noRestoreBL
-cpi r19, 1
-breq ijmpADDR
-rjmp invalidCommand
+ret
 
 
 char5:			; 5 character commands
@@ -132,10 +260,6 @@ rcall setZClear
 rcall compareString
 cpi r19, 1
 breq done
-rcall setZEcho0
-rcall compareString
-cpi r19, 1
-breq handleEchoNoARG
 rjmp invalidCommand
 
 
@@ -153,18 +277,7 @@ rcall setZRegs
 rcall compareString
 cpi r19, 1
 breq done
-rcall setZEcho
-rcall compareString
-cpi r19, 1
-breq handleEchoNoARG
 rjmp invalidCommand
-
-
-handleEchoNoARG:
-ldi r20, 254
-mov r0, r20
-rcall echoNoARG
-ret
 
 
 done:			; match. set cmd id
@@ -224,12 +337,6 @@ ldi ZL, lo8(clear)
 ret
 
 
-setZEcho0:
-ldi ZH, hi8(echo0)
-ldi ZL, lo8(echo0)
-ret
-
-
 setZEcho:
 ldi ZH, hi8(echo)
 ldi ZL, lo8(echo)
@@ -270,9 +377,8 @@ help: .ascii "help"
 info: .ascii "info"
 regs: .ascii "regs"
 clear: .ascii "clear"
-echo0: .ascii "echo "
 echo: .ascii "echo"
-mread: .ascii "mread " 
-mwrite: .ascii "mwrite "
+mread: .ascii "mread" 
+mwrite: .ascii "mwrite"
 space: .ascii " "
-indirectJump: .ascii "ijmp "
+indirectJump: .ascii "ijmp"

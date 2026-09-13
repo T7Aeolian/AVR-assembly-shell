@@ -28,7 +28,7 @@ rcall terminalNewLine
 rjmp loop1
 
 
-infoMessage: .asciz "      _	        _______.	CPU: ATmega328p\r     /@.       /@@@@@@@@.	SRAM: 2KB\r    /@^@.     /@/``````@@.	FLASH: 32KB\r   /@/_`@.   /@@@@@@@@@@/	EEPROM: 1KB\r  /@@@@@@@. /@@@@.``````	AVR: 100%\r /@/`````@@V@/`@@@@.		VERSION: 0.1.0-alpha\r/@/      `@@/    `@@@@."
+infoMessage: .asciz "      _	        _______.	CPU: ATmega328p\r     /@.       /@@@@@@@@.	SRAM: 2KiB\r    /@^@.     /@/``````@@.	FLASH: 32KiB\r   /@/_`@.   /@@@@@@@@@@/	EEPROM: 1KiB\r  /@@@@@@@. /@@@@.``````	AVR: 100%\r /@/`````@@V@/`@@@@.		VERSION: 0.1.0-alpha\r/@/      `@@/    `@@@@."
 
 
 .align 1

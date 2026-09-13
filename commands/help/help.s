@@ -28,7 +28,7 @@ rcall terminalNewLine
 rjmp loop1
 
 
-helpMessage: .asciz 	"help - display this list\rinfo - display system info\rregs - display all register values\rclear - clear display\recho - print argument\rmread - read data memory(check INSTRUCTIONS.md)\rmwrite - write to data memory(check INSTRUCTIONS.md)\rijmp - indirect jump to address (check INSTRUCTIONS.md)"
+helpMessage: .asciz 	"help - display this list\rinfo - display system info\rregs - display all register values\rclear - clear display\recho - print argument\rmread - read data memory(check README.md)\rmwrite - write to data memory(check README.md)\rijmp - indirect jump to address (check README.md)"
 
 
 

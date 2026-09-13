@@ -87,10 +87,10 @@ ret
 isValidChar:
 cpi r18, 0x61
 brsh lowerLetterRangeLowercase
-cpi r18, 0x30
-brsh lowerDigitRange
 cpi r18, 0x41
 brsh lowerLetterRangeUppercase
+cpi r18, 0x30
+brsh lowerDigitRange
 rjmp invalidChar
 lowerDigitRange:
 cpi r18, 0x3A
