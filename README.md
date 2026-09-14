@@ -1,7 +1,7 @@
 # AVR-Assembly-Shell
 v0.1.0-alpha
 
-!WARNING!:  This project is experimental. Commands such as `mwrite` and `ijmp` intentionally provide low-level access and can put the MCU into an unusable state until reset.
+!WARNING!:  This project is experimental. Commands such as `mwrite` and `ijmp` intentionally provide low-level access and can put the MCU into an unusable state until reset. This version only supports letters, numbers, special characters, backspace and enter but it doesn't support any other keys like: arrow keys, tab, esc etc. Using any other keys besides the one listed will cause unexpected behavior.
 
 A simple interactive shell made in bare-metal AVR assembly for the ATmega328p
 
