@@ -1,4 +1,7 @@
 # AVR-Assembly-Shell
+v0.1.0-alpha
+
+!WARNING!:  This project is experimental. Commands such as `mwrite` and `ijmp` intentionally provide low-level access and can put the MCU into an unusable state until reset.
 
 A simple interactive shell made in bare-metal AVR assembly for the ATmega328p
 
@@ -23,79 +26,94 @@ The goal of the project is to learn how processors work on the low-level and to 
 
 ## COMMANDS
 
-No arguments:
-
-help    |   displays list of all comands
-info    |   displays general system info
-regs    |   displays value of all registers + SP & CP
-clear   |   clears display
-
-Support arguments:
-
-echo    |   prints back text to the terminal
-mread   |   read value of an address in data memory
-mwrite  |   write value to an address in data memory
-ijmp    |   indirect jump to instruction address and flash(control PC)
+Command |     Arguments     | Description
+--------------------------------------------------
+help    |         -         | Displays command list
+info    |         -         | Displays system info
+regs    |         -         | Displays value CPU registers, SP & CP
+clear   |         -         | Clears terminal
+echo    | <text>            | Print text
+mread   | <address>         | Read data memory
+mwrite  | <address> <value> | Write data memory
+ijmp    | <address>         | Indirect jump
 
 ### Echo
 
-Syntax:     echo <arg1>
-Example:    echo hello
-Output:     hello
+**Syntax:**     `echo <text>`
+**Example:**    echo hello
+**Output:**     hello
             
 ### Mread
 
-Syntax:     mread <arg1>,where arg1 is the address you wish to read is written in hexadecimal(0000 - 08ff. must be 4 chracters). Supports both lower and uppercase characters.
+**Syntax:**     `mread <address>`
 
-Example:    mread 0100
-Output:     Value of address: 0x6D
+- `<address>` - 4 hexadecimal characters `0000`-`08FF`
+
+Both uppercase and lowercase hexadecimal characters are supported.
+
+**Example:**    mread 0100
+**Output:**     Value of address: 0x6D
 
 ### Mwrite
 
-Syntax:     mwrite <arg1> <arg2>, whre arg1 is the address you wish to write to in hexadecimal(0000 - 08ff. must be 4 characters) and arg2 is the value you wish to write(00-ff. must be 2 characters). Supports both lower and uppercase characters.
+!WARNING!: writing an incorrect value to a hardware register can cause the system to stop working.
 
-Example:    mwrite 0100 ff
-Output:     Written value 0xFF to address 0x0100
+**Syntax:**     `mwrite <address> <value>`
 
-Interesting:    Can be used to control GPIO registers so for example if you do "mwrite 0024 20"(set bit 5 in DDRB | make pin 13 output) and "mwrite 0025 20"(set bit 5 in PORTB | set pin 13 HIGH). I reccomend checking out the official ATmega328p manual to see how else this can be used. Writing to the wrong address can cause the shell to stop working.
+- `<address>` - 4 hexadecimal characters `0000`-`08FF`
+- `<value>` - 2 hexadecimal characters `00`-`FF`
+
+Both uppercase and lowercase hexadecimal characters are supported. 
+
+**Example:**    mwrite 0100 ff
+**Output:**     Written value 0xFF to address 0x0100
+
+**Interesting:**    Because `mwrite` can manipulate all of the ATmega328p's data space it can be used to configure peripheral registers. I recommend reading the official ATmega328p manual to see, how else this could be used.
 
 ### Ijmp
 
-Syntax:     ijmp <arg1>, where arg1 is the address you wish to jump to in hexadecimal byte format(gets converted to word format). Supports both lower and uppercase characters.
+**Syntax:**     ijmp <address>
 
-Example:    ijmp 0100
-Output:     (Very dependant on address you jump to)
+- `<address>` - 4 hexadecimal characters(address in byte format. It gets converted to word format automatically) - `0000`-`7FFF`
 
-Interesting:    "ijmp 0000" essentially works as a command that resets the shell. Check MEMORY_MAP.md or OBJDUMP.md for the address of individual functions/instructions. I recommend checking out the official ATmega328p manual. Jumping to some addresses can cause the shell to stop working.
+**Example:**    ijmp 0100
+**Output:**     (Outcome depends on address you jump to)
+
+**Interesting:**    `ijmp 0000` essentially works as a command that resets the shell. Check MEMORY_MAP.md or OBJDUMP.md, found in build/version/ for the address of individual functions/instructions.
 
 ## ARCHITECTURE
 
 This project is divided into several modules:
 
-- uart/ - contains setup for uart conf and essential functions
-- terminal/ - contains functions that coontrol the terminal
-- buffer/ - contains logic behind the input buffer + error handling
-- parser/ - contains logic behind command parsing, argument validation, error handling and id assigning
-- shell/ - contains main shell logic, backspace + enter handling
-- conversions/ - contains function ahtoi(ascii hexadecimal to intiger)
-- commands/ - contains the functions for individual commands
+- uart/ - UART initialization and communication functions
+- terminal/ - Terminal control functions
+- buffer/ - Input buffer management and error handling
+- parser/ - Command parsing, argument validation and ID assignment
+- shell/ - Main shell loop and input handling
+- conversions/ - ASCII/Hexadecimal conversion function
+- commands/ - Individual shell command implementations
 
 ## HARDWARE
 
+This project has currently only been tested on Linux. The serial-device and terminal instructions may require modification on Windows or other operating systems. Windows support is currently untested.
+
 To use this project you need:
 
-- Arduino Uno R3/ATmega328p
-- USB connection to computer
-- Terminal emulator - picocom
-- Program to flash code - avrdude
-- .hex file found in build/
-- Serial device for the Arduino Uno R3 - arduino-cli
+- Arduino Uno R3 / ATmega328p
+- USB connection to a computer
+- `picocom` for serial terminal
+- `avrdude` for flashing
+- .hex file found in build/version/
+- `arduino-cli` for board / port detection
 
-To find the serial device: 'arduino-cli board list' look for one with the board name: ARDUINO UNO(in my case /dev/ttyACM0).
+To find the serial device use: 'arduino-cli board list' look for one with the board name: ARDUINO UNO(in my case /dev/ttyACM0).
 
-To flash the file: 'avr-dude -v -p atmega328p -c arduino -P YOUR_SERIAL_DEVICE -b 115200 -U "flash:w:FILE:i"', where FILE is the name of the .hex file.
+To flash the file: 'avrdude -v -p atmega328p -c arduino -P `YOUR_SERIAL_DEVICE` -b 115200 -U "flash:w:`FILE`:i"'
 
-To start terminal emulator: 'picocom -b 250000 YOUR_SERIAL_DEVICE'
+To start terminal emulator: 'picocom -b 250000 YOUR_SERIAL_DEVICE' and to exit picocom: Ctrl-A Ctrl-X
+
+`avrdude` uses the bootloader's baudrate(115200), while the shell itself communicates at 250000 baud.
+
 
 ## ROADMAP
 
@@ -103,11 +121,16 @@ To start terminal emulator: 'picocom -b 250000 YOUR_SERIAL_DEVICE'
 - [x] Interactive shell
 - [x] Command parser
 - [x] read/write data memory
-- [ ] username + password validation with EEPROM
+- [ ] EEPROM interface
 - [ ] Interrupt support
 - [ ] Tiny File system
+- [ ] Watchdog support
+- [ ] User programs
+- [ ] Privileges
 
 ## WHY?
 
-I was bored and decided to try to make something challending in assembly plus ive always been curious how computers work on the hardware level so i decided to make this. Im sure the code is far from optimal but this is the first ever version and i plan on redesigning a lot. I decided to do it bare-metal becase might as well.
+I was bored and decided to try to make something challending in assembly. Ive always been curious how computers work on the hardware level, so i decided to make this. I decided to do it bare-metal becase might as well.
+
+The code is far from optimal and the architecture will probably change as the project develops.
 
