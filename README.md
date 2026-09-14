@@ -27,15 +27,15 @@ The goal of the project is to learn how processors work on the low-level and to 
 ## COMMANDS
 
 Command |     Arguments     | Description
---------------------------------------------------
+|---|---|---|
 help    |         -         | Displays command list
 info    |         -         | Displays system info
 regs    |         -         | Displays values of CPU registers, SP & PC
 clear   |         -         | Clears terminal
-echo    | <text>            | Print text
-mread   | <address>         | Read data memory
-mwrite  | <address> <value> | Write data memory
-ijmp    | <address>         | Indirect jump
+echo    | `<text>`            | Print text
+mread   | `<address>`         | Read data memory
+mwrite  | `<address>` `<value>` | Write data memory
+ijmp    | `<address>`         | Indirect jump
 
 ### Echo
 
