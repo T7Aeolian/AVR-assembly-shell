@@ -7,7 +7,7 @@ A simple interactive shell made in bare-metal AVR assembly for the ATmega328p
 
 ## OVERVIEW
 
-The project is written entirely in AVR assembly and comunicates with a computer via UART.
+The project is written entirely in AVR assembly and communicates with a computer via UART.
 
 Rather than having any safety this project gives the user direct register manipulation and control over the execution flow of the program.
 
@@ -15,14 +15,14 @@ The goal of the project is to learn how processors work on the low-level and to 
 
 ## FEATURES
 
--Interactive UART terminal
--Command parser with argument validation
--Data memory manipulation(read/write)
--Control over the execution flow
--GPIO configuration
--Hexadecimal input/output
--32 character input buffer
--Written entirely in assembly
+- Interactive UART terminal
+- Command parser with argument validation
+- Data memory manipulation(read/write)
+- Control over the execution flow
+- GPIO configuration
+- Hexadecimal input/output
+- 32 character input buffer
+- Written entirely in assembly
 
 ## COMMANDS
 
@@ -30,7 +30,7 @@ Command |     Arguments     | Description
 --------------------------------------------------
 help    |         -         | Displays command list
 info    |         -         | Displays system info
-regs    |         -         | Displays value CPU registers, SP & CP
+regs    |         -         | Displays values of CPU registers, SP & PC
 clear   |         -         | Clears terminal
 echo    | <text>            | Print text
 mread   | <address>         | Read data memory
@@ -106,7 +106,7 @@ To use this project you need:
 - .hex file found in build/version/
 - `arduino-cli` for board / port detection
 
-To find the serial device use: 'arduino-cli board list' look for one with the board name: ARDUINO UNO(in my case /dev/ttyACM0).
+To find the serial device, use 'arduino-cli board list' look for one with the board name: ARDUINO UNO(in my case /dev/ttyACM0).
 
 To flash the file: 'avrdude -v -p atmega328p -c arduino -P `YOUR_SERIAL_DEVICE` -b 115200 -U "flash:w:`FILE`:i"'
 
@@ -130,7 +130,7 @@ To start terminal emulator: 'picocom -b 250000 YOUR_SERIAL_DEVICE' and to exit p
 
 ## WHY?
 
-I was bored and decided to try to make something challending in assembly. Ive always been curious how computers work on the hardware level, so i decided to make this. I decided to do it bare-metal becase might as well.
+I was bored and decided to try to make something challenging in assembly. I've always been curious how computers work on the hardware level, so i decided to make this. I decided to do it bare-metal becase I might as well.
 
 The code is far from optimal and the architecture will probably change as the project develops.
 
