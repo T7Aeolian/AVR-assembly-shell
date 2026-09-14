@@ -1,28 +1,39 @@
+All addresses are in byte, so use directly for ijmp
 
-debug.elf:     file format elf32-avr
+v0.1.0-alpha.elf:     file format elf32-avr
 
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000000  00800100  00000ac2  00000b56  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000ac2  00000000  00000000  00000094  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .bss          00000021  00800100  00800100  00000b56  2**0
+                  ALLOC
+  3 .avr.prop     00000058  00000000  00000000  00000b56  2**0
+                  CONTENTS, READONLY
 
 Disassembly of section .text:
 
 00000000 <__ctors_end>:
-   0:	70 d0       	rcall	.+224    	; 0xe2 <uartInit>
-   2:	da d0       	rcall	.+436    	; 0x1b8 <terminalInit>
+   0:	8c d0       	rcall	.+280    	; 0x11a <uartInit>
+   2:	f6 d0       	rcall	.+492    	; 0x1f0 <terminalInit>
 
 00000004 <shellInit>:
-   4:	5b d2       	rcall	.+1206   	; 0x4bc <bufferReset>
+   4:	70 d2       	rcall	.+1248   	; 0x4e6 <bufferReset>
 
 00000006 <shellRun>:
-   6:	8c d0       	rcall	.+280    	; 0x120 <uartRecv>
+   6:	a8 d0       	rcall	.+336    	; 0x158 <uartRecv>
    8:	9d 30       	cpi	r25, 0x0D	; 13
    a:	71 f0       	breq	.+28     	; 0x28 <shellHandleEnter>
    c:	9f 37       	cpi	r25, 0x7F	; 127
    e:	31 f0       	breq	.+12     	; 0x1c <shellHandleBackspace>
-  10:	43 d2       	rcall	.+1158   	; 0x498 <bufferAdd>
-  12:	74 d0       	rcall	.+232    	; 0xfc <uartSend>
+  10:	58 d2       	rcall	.+1200   	; 0x4c2 <bufferAdd>
+  12:	90 d0       	rcall	.+288    	; 0x134 <uartSend>
   14:	f8 cf       	rjmp	.-16     	; 0x6 <shellRun>
 
 00000016 <getBL>:
-  16:	5a d2       	rcall	.+1204   	; 0x4cc <setYBL>
+  16:	6f d2       	rcall	.+1246   	; 0x4f6 <setYBL>
   18:	08 81       	ld	r16, Y
   1a:	08 95       	ret
 
@@ -30,1682 +41,1852 @@ Disassembly of section .text:
   1c:	fc df       	rcall	.-8      	; 0x16 <getBL>
   1e:	00 30       	cpi	r16, 0x00	; 0
   20:	91 f3       	breq	.-28     	; 0x6 <shellRun>
-  22:	3f d2       	rcall	.+1150   	; 0x4a2 <bufferDel>
-  24:	ce d0       	rcall	.+412    	; 0x1c2 <terminalBackspace>
+  22:	54 d2       	rcall	.+1192   	; 0x4cc <bufferDel>
+  24:	ea d0       	rcall	.+468    	; 0x1fa <terminalBackspace>
   26:	ef cf       	rjmp	.-34     	; 0x6 <shellRun>
 
 00000028 <shellHandleEnter>:
   28:	f6 df       	rcall	.-20     	; 0x16 <getBL>
   2a:	00 30       	cpi	r16, 0x00	; 0
   2c:	31 f0       	breq	.+12     	; 0x3a <emptyLine>
-  2e:	e5 d0       	rcall	.+458    	; 0x1fa <terminalNewLine>
-  30:	70 d2       	rcall	.+1248   	; 0x512 <parseCommand>
+  2e:	01 d1       	rcall	.+514    	; 0x232 <terminalNewLine>
+  30:	85 d2       	rcall	.+1290   	; 0x53c <parseCommand>
   32:	05 d0       	rcall	.+10     	; 0x3e <shellExecute>
-  34:	43 d2       	rcall	.+1158   	; 0x4bc <bufferReset>
-  36:	de d0       	rcall	.+444    	; 0x1f4 <terminalEnter>
+  34:	58 d2       	rcall	.+1200   	; 0x4e6 <bufferReset>
+  36:	fa d0       	rcall	.+500    	; 0x22c <terminalEnter>
   38:	e6 cf       	rjmp	.-52     	; 0x6 <shellRun>
 
 0000003a <emptyLine>:
-  3a:	dc d0       	rcall	.+440    	; 0x1f4 <terminalEnter>
+  3a:	f8 d0       	rcall	.+496    	; 0x22c <terminalEnter>
   3c:	e4 cf       	rjmp	.-56     	; 0x6 <shellRun>
 
 0000003e <shellExecute>:
   3e:	10 e2       	ldi	r17, 0x20	; 32
   40:	01 16       	cp	r0, r17
-  42:	d1 f0       	breq	.+52     	; 0x78 <callHelpCommand>
+  42:	c9 f0       	breq	.+50     	; 0x76 <callHelpCommand>
   44:	11 e2       	ldi	r17, 0x21	; 33
   46:	01 16       	cp	r0, r17
-  48:	c9 f0       	breq	.+50     	; 0x7c <callInfoCommand>
+  48:	c1 f0       	breq	.+48     	; 0x7a <callInfoCommand>
   4a:	12 e2       	ldi	r17, 0x22	; 34
   4c:	01 16       	cp	r0, r17
-  4e:	c1 f0       	breq	.+48     	; 0x80 <callRegsCommand>
+  4e:	b9 f0       	breq	.+46     	; 0x7e <callRegsCommand>
   50:	10 e3       	ldi	r17, 0x30	; 48
   52:	01 16       	cp	r0, r17
-  54:	b9 f0       	breq	.+46     	; 0x84 <callClearCommand>
-  56:	10 e7       	ldi	r17, 0x70	; 112
+  54:	b1 f0       	breq	.+44     	; 0x82 <callClearCommand>
+  56:	11 ef       	ldi	r17, 0xF1	; 241
   58:	01 16       	cp	r0, r17
-  5a:	e1 f0       	breq	.+56     	; 0x94 <callIjmp>
-  5c:	10 e8       	ldi	r17, 0x80	; 128
+  5a:	d9 f0       	breq	.+54     	; 0x92 <callIjmp>
+  5c:	12 ef       	ldi	r17, 0xF2	; 242
   5e:	01 16       	cp	r0, r17
-  60:	a9 f0       	breq	.+42     	; 0x8c <callMread>
-  62:	10 ec       	ldi	r17, 0xC0	; 192
+  60:	a1 f0       	breq	.+40     	; 0x8a <callMread>
+  62:	13 ef       	ldi	r17, 0xF3	; 243
   64:	01 16       	cp	r0, r17
-  66:	a1 f0       	breq	.+40     	; 0x90 <callMwrite>
+  66:	99 f0       	breq	.+38     	; 0x8e <callMwrite>
   68:	10 ef       	ldi	r17, 0xF0	; 240
   6a:	01 16       	cp	r0, r17
-  6c:	69 f0       	breq	.+26     	; 0x88 <callEchoCommand>
-  6e:	1e ef       	ldi	r17, 0xFE	; 254
+  6c:	61 f0       	breq	.+24     	; 0x86 <callEchoCommand>
+  6e:	1d ef       	ldi	r17, 0xFD	; 253
   70:	01 16       	cp	r0, r17
-  72:	09 f0       	breq	.+2      	; 0x76 <returnCase>
-  74:	13 c0       	rjmp	.+38     	; 0x9c <invalidCommand>
+  72:	81 f0       	breq	.+32     	; 0x94 <callInvalidArg>
+  74:	14 c0       	rjmp	.+40     	; 0x9e <invalidCommand>
 
-00000076 <returnCase>:
-  76:	08 95       	ret
+00000076 <callHelpCommand>:
+  76:	01 d1       	rcall	.+514    	; 0x27a <helpCommand>
+  78:	08 95       	ret
 
-00000078 <callHelpCommand>:
-  78:	e4 d0       	rcall	.+456    	; 0x242 <helpCommand>
-  7a:	08 95       	ret
+0000007a <callInfoCommand>:
+  7a:	96 d1       	rcall	.+812    	; 0x3a8 <infoCommand>
+  7c:	08 95       	ret
 
-0000007c <callInfoCommand>:
-  7c:	82 d1       	rcall	.+772    	; 0x382 <infoCommand>
-  7e:	08 95       	ret
+0000007e <callRegsCommand>:
+  7e:	6e d3       	rcall	.+1756   	; 0x75c <regsCommand>
+  80:	08 95       	ret
 
-00000080 <callRegsCommand>:
-  80:	06 d3       	rcall	.+1548   	; 0x68e <regsCommand>
-  82:	08 95       	ret
+00000082 <callClearCommand>:
+  82:	8d d1       	rcall	.+794    	; 0x39e <clearCommand>
+  84:	08 95       	ret
 
-00000084 <callClearCommand>:
-  84:	79 d1       	rcall	.+754    	; 0x378 <clearCommand>
-  86:	08 95       	ret
+00000086 <callEchoCommand>:
+  86:	68 d4       	rcall	.+2256   	; 0x958 <echoCommand>
+  88:	08 95       	ret
 
-00000088 <callEchoCommand>:
-  88:	07 d4       	rcall	.+2062   	; 0x898 <echoCommand>
-  8a:	08 95       	ret
+0000008a <callMread>:
+  8a:	f1 d4       	rcall	.+2530   	; 0xa6e <mread>
+  8c:	08 95       	ret
 
-0000008c <callMread>:
-  8c:	a4 d4       	rcall	.+2376   	; 0x9d6 <mread>
-  8e:	08 95       	ret
+0000008e <callMwrite>:
+  8e:	dc d4       	rcall	.+2488   	; 0xa48 <mwrite>
+  90:	08 95       	ret
 
-00000090 <callMwrite>:
-  90:	8f d4       	rcall	.+2334   	; 0x9b0 <mwrite>
-  92:	08 95       	ret
+00000092 <callIjmp>:
+  92:	09 94       	ijmp
 
-00000094 <callIjmp>:
-  94:	09 94       	ijmp
+00000094 <callInvalidArg>:
+  94:	16 d0       	rcall	.+44     	; 0xc2 <printInvalidArg>
+  96:	08 95       	ret
 
-00000096 <setZCommandNotFound>:
-  96:	f0 e0       	ldi	r31, 0x00	; 0
-  98:	e0 ec       	ldi	r30, 0xC0	; 192
-  9a:	08 95       	ret
+00000098 <setZCommandNotFound>:
+  98:	f0 e0       	ldi	r31, 0x00	; 0
+  9a:	e6 ed       	ldi	r30, 0xD6	; 214
+  9c:	08 95       	ret
 
-0000009c <invalidCommand>:
-  9c:	fc df       	rcall	.-8      	; 0x96 <setZCommandNotFound>
+0000009e <invalidCommand>:
+  9e:	fc df       	rcall	.-8      	; 0x98 <setZCommandNotFound>
 
-0000009e <loop2>:
-  9e:	95 91       	lpm	r25, Z+
-  a0:	90 30       	cpi	r25, 0x00	; 0
-  a2:	11 f0       	breq	.+4      	; 0xa8 <done2>
-  a4:	2b d0       	rcall	.+86     	; 0xfc <uartSend>
-  a6:	fb cf       	rjmp	.-10     	; 0x9e <loop2>
+000000a0 <loop2>:
+  a0:	95 91       	lpm	r25, Z+
+  a2:	90 30       	cpi	r25, 0x00	; 0
+  a4:	11 f0       	breq	.+4      	; 0xaa <done2>
+  a6:	46 d0       	rcall	.+140    	; 0x134 <uartSend>
+  a8:	fb cf       	rjmp	.-10     	; 0xa0 <loop2>
 
-000000a8 <done2>:
-  a8:	02 d0       	rcall	.+4      	; 0xae <printBuffer>
-  aa:	08 d2       	rcall	.+1040   	; 0x4bc <bufferReset>
-  ac:	08 95       	ret
+000000aa <done2>:
+  aa:	02 d0       	rcall	.+4      	; 0xb0 <printBuffer>
+  ac:	1c d2       	rcall	.+1080   	; 0x4e6 <bufferReset>
+  ae:	08 95       	ret
 
-000000ae <printBuffer>:
-  ae:	0b d2       	rcall	.+1046   	; 0x4c6 <resetXBuffer>
-  b0:	b2 df       	rcall	.-156    	; 0x16 <getBL>
+000000b0 <printBuffer>:
+  b0:	1f d2       	rcall	.+1086   	; 0x4f0 <resetXBuffer>
+  b2:	b1 df       	rcall	.-158    	; 0x16 <getBL>
 
-000000b2 <loop1>:
-  b2:	00 30       	cpi	r16, 0x00	; 0
-  b4:	21 f0       	breq	.+8      	; 0xbe <done1>
-  b6:	9d 91       	ld	r25, X+
-  b8:	21 d0       	rcall	.+66     	; 0xfc <uartSend>
-  ba:	0a 95       	dec	r16
-  bc:	fa cf       	rjmp	.-12     	; 0xb2 <loop1>
+000000b4 <loop1>:
+  b4:	00 30       	cpi	r16, 0x00	; 0
+  b6:	21 f0       	breq	.+8      	; 0xc0 <done1>
+  b8:	9d 91       	ld	r25, X+
+  ba:	3c d0       	rcall	.+120    	; 0x134 <uartSend>
+  bc:	0a 95       	dec	r16
+  be:	fa cf       	rjmp	.-12     	; 0xb4 <loop1>
 
-000000be <done1>:
-  be:	08 95       	ret
+000000c0 <done1>:
+  c0:	08 95       	ret
 
-000000c0 <commandNotFound>:
-  c0:	45 52       	subi	r20, 0x25	; 37
-  c2:	52 4f       	sbci	r21, 0xF2	; 242
-  c4:	52 3a       	cpi	r21, 0xA2	; 162
-  c6:	20 43       	sbci	r18, 0x30	; 48
-  c8:	6f 6d       	ori	r22, 0xDF	; 223
-  ca:	6d 61       	ori	r22, 0x1D	; 29
-  cc:	6e 64       	ori	r22, 0x4E	; 78
-  ce:	20 6e       	ori	r18, 0xE0	; 224
-  d0:	6f 74       	andi	r22, 0x4F	; 79
-  d2:	20 66       	ori	r18, 0x60	; 96
-  d4:	6f 75       	andi	r22, 0x5F	; 95
-  d6:	6e 64       	ori	r22, 0x4E	; 78
-  d8:	3a 20       	and	r3, r10
+000000c2 <printInvalidArg>:
+  c2:	06 d0       	rcall	.+12     	; 0xd0 <setZInvalidArg>
+
+000000c4 <loop3>:
+  c4:	95 91       	lpm	r25, Z+
+  c6:	90 30       	cpi	r25, 0x00	; 0
+  c8:	11 f0       	breq	.+4      	; 0xce <done3>
+  ca:	34 d0       	rcall	.+104    	; 0x134 <uartSend>
+  cc:	fb cf       	rjmp	.-10     	; 0xc4 <loop3>
+
+000000ce <done3>:
+  ce:	08 95       	ret
+
+000000d0 <setZInvalidArg>:
+  d0:	f0 e0       	ldi	r31, 0x00	; 0
+  d2:	e1 ef       	ldi	r30, 0xF1	; 241
+  d4:	08 95       	ret
+
+000000d6 <commandNotFound>:
+  d6:	45 52       	subi	r20, 0x25	; 37
+  d8:	52 4f       	sbci	r21, 0xF2	; 242
+  da:	52 3a       	cpi	r21, 0xA2	; 162
+  dc:	20 43       	sbci	r18, 0x30	; 48
+  de:	6f 6d       	ori	r22, 0xDF	; 223
+  e0:	6d 61       	ori	r22, 0x1D	; 29
+  e2:	6e 64       	ori	r22, 0x4E	; 78
+  e4:	20 6e       	ori	r18, 0xE0	; 224
+  e6:	6f 74       	andi	r22, 0x4F	; 79
+  e8:	20 66       	ori	r18, 0x60	; 96
+  ea:	6f 75       	andi	r22, 0x5F	; 95
+  ec:	6e 64       	ori	r22, 0x4E	; 78
+  ee:	3a 20       	and	r3, r10
 	...
 
-000000dc <resetZHex>:
-  dc:	f1 e0       	ldi	r31, 0x01	; 1
-  de:	e8 ea       	ldi	r30, 0xA8	; 168
-  e0:	08 95       	ret
+000000f1 <invalidArg>:
+  f1:	45 52       	subi	r20, 0x25	; 37
+  f3:	52 4f       	sbci	r21, 0xF2	; 242
+  f5:	52 3a       	cpi	r21, 0xA2	; 162
+  f7:	20 49       	sbci	r18, 0x90	; 144
+  f9:	6e 76       	andi	r22, 0x6E	; 110
+  fb:	61 6c       	ori	r22, 0xC1	; 193
+  fd:	69 64       	ori	r22, 0x49	; 73
+  ff:	20 61       	ori	r18, 0x10	; 16
+ 101:	72 67       	ori	r23, 0x72	; 114
+ 103:	75 6d       	ori	r23, 0xD5	; 213
+ 105:	65 6e       	ori	r22, 0xE5	; 229
+ 107:	74 2f       	mov	r23, r20
+ 109:	73 20       	and	r7, r3
+ 10b:	70 72       	andi	r23, 0x20	; 32
+ 10d:	6f 76       	andi	r22, 0x6F	; 111
+ 10f:	69 64       	ori	r22, 0x49	; 73
+ 111:	65 64       	ori	r22, 0x45	; 69
+	...
 
-000000e2 <uartInit>:
-  e2:	08 e1       	ldi	r16, 0x18	; 24
-  e4:	00 93 c1 00 	sts	0x00C1, r16	; 0x8000c1 <__DATA_REGION_ORIGIN__+0x61>
-  e8:	06 e0       	ldi	r16, 0x06	; 6
-  ea:	00 93 c2 00 	sts	0x00C2, r16	; 0x8000c2 <__DATA_REGION_ORIGIN__+0x62>
-  ee:	03 e0       	ldi	r16, 0x03	; 3
-  f0:	00 93 c4 00 	sts	0x00C4, r16	; 0x8000c4 <__DATA_REGION_ORIGIN__+0x64>
-  f4:	00 e0       	ldi	r16, 0x00	; 0
-  f6:	00 93 c5 00 	sts	0x00C5, r16	; 0x8000c5 <__DATA_REGION_ORIGIN__+0x65>
-  fa:	08 95       	ret
+00000114 <resetZHex>:
+ 114:	f1 e0       	ldi	r31, 0x01	; 1
+ 116:	e0 ee       	ldi	r30, 0xE0	; 224
+ 118:	08 95       	ret
 
-000000fc <uartSend>:
-  fc:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
- 100:	85 ff       	sbrs	r24, 5
- 102:	fc cf       	rjmp	.-8      	; 0xfc <uartSend>
- 104:	70 91 c0 00 	lds	r23, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
- 108:	70 64       	ori	r23, 0x40	; 64
- 10a:	70 93 c0 00 	sts	0x00C0, r23	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
- 10e:	90 93 c6 00 	sts	0x00C6, r25	; 0x8000c6 <__DATA_REGION_ORIGIN__+0x66>
- 112:	01 d0       	rcall	.+2      	; 0x116 <confirm_send>
- 114:	08 95       	ret
+0000011a <uartInit>:
+ 11a:	08 e1       	ldi	r16, 0x18	; 24
+ 11c:	00 93 c1 00 	sts	0x00C1, r16	; 0x8000c1 <__DATA_REGION_ORIGIN__+0x61>
+ 120:	06 e0       	ldi	r16, 0x06	; 6
+ 122:	00 93 c2 00 	sts	0x00C2, r16	; 0x8000c2 <__DATA_REGION_ORIGIN__+0x62>
+ 126:	03 e0       	ldi	r16, 0x03	; 3
+ 128:	00 93 c4 00 	sts	0x00C4, r16	; 0x8000c4 <__DATA_REGION_ORIGIN__+0x64>
+ 12c:	00 e0       	ldi	r16, 0x00	; 0
+ 12e:	00 93 c5 00 	sts	0x00C5, r16	; 0x8000c5 <__DATA_REGION_ORIGIN__+0x65>
+ 132:	08 95       	ret
 
-00000116 <confirm_send>:
- 116:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
- 11a:	86 ff       	sbrs	r24, 6
- 11c:	fc cf       	rjmp	.-8      	; 0x116 <confirm_send>
- 11e:	08 95       	ret
+00000134 <uartSend>:
+ 134:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
+ 138:	85 ff       	sbrs	r24, 5
+ 13a:	fc cf       	rjmp	.-8      	; 0x134 <uartSend>
+ 13c:	70 91 c0 00 	lds	r23, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
+ 140:	70 64       	ori	r23, 0x40	; 64
+ 142:	70 93 c0 00 	sts	0x00C0, r23	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
+ 146:	90 93 c6 00 	sts	0x00C6, r25	; 0x8000c6 <__DATA_REGION_ORIGIN__+0x66>
+ 14a:	01 d0       	rcall	.+2      	; 0x14e <confirm_send>
+ 14c:	08 95       	ret
 
-00000120 <uartRecv>:
- 120:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
- 124:	87 ff       	sbrs	r24, 7
- 126:	fc cf       	rjmp	.-8      	; 0x120 <uartRecv>
- 128:	90 91 c6 00 	lds	r25, 0x00C6	; 0x8000c6 <__DATA_REGION_ORIGIN__+0x66>
- 12c:	08 95       	ret
+0000014e <confirm_send>:
+ 14e:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
+ 152:	86 ff       	sbrs	r24, 6
+ 154:	fc cf       	rjmp	.-8      	; 0x14e <confirm_send>
+ 156:	08 95       	ret
 
-0000012e <uartSendHex>:
- 12e:	11 24       	eor	r1, r1
- 130:	04 d0       	rcall	.+8      	; 0x13a <high_hex>
- 132:	d4 df       	rcall	.-88     	; 0xdc <resetZHex>
- 134:	0b d0       	rcall	.+22     	; 0x14c <low_hex>
- 136:	d2 df       	rcall	.-92     	; 0xdc <resetZHex>
- 138:	08 95       	ret
-
-0000013a <high_hex>:
- 13a:	65 2f       	mov	r22, r21
- 13c:	cf df       	rcall	.-98     	; 0xdc <resetZHex>
- 13e:	62 95       	swap	r22
- 140:	6f 70       	andi	r22, 0x0F	; 15
- 142:	e6 0f       	add	r30, r22
- 144:	f1 1d       	adc	r31, r1
- 146:	94 91       	lpm	r25, Z
- 148:	d9 df       	rcall	.-78     	; 0xfc <uartSend>
- 14a:	08 95       	ret
-
-0000014c <low_hex>:
- 14c:	65 2f       	mov	r22, r21
- 14e:	c6 df       	rcall	.-116    	; 0xdc <resetZHex>
- 150:	6f 70       	andi	r22, 0x0F	; 15
- 152:	e6 0f       	add	r30, r22
- 154:	f1 1d       	adc	r31, r1
- 156:	94 91       	lpm	r25, Z
- 158:	d1 df       	rcall	.-94     	; 0xfc <uartSend>
- 15a:	08 95       	ret
-
-0000015c <uartSendDec>:
- 15c:	13 d0       	rcall	.+38     	; 0x184 <if_zero>
-
-0000015e <continue>:
- 15e:	1d d0       	rcall	.+58     	; 0x19a <send_decimal>
- 160:	90 e2       	ldi	r25, 0x20	; 32
- 162:	cc df       	rcall	.-104    	; 0xfc <uartSend>
+00000158 <uartRecv>:
+ 158:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__DATA_REGION_ORIGIN__+0x60>
+ 15c:	87 ff       	sbrs	r24, 7
+ 15e:	fc cf       	rjmp	.-8      	; 0x158 <uartRecv>
+ 160:	90 91 c6 00 	lds	r25, 0x00C6	; 0x8000c6 <__DATA_REGION_ORIGIN__+0x66>
  164:	08 95       	ret
 
-00000166 <hundreds>:
- 166:	54 36       	cpi	r21, 0x64	; 100
- 168:	98 f0       	brcs	.+38     	; 0x190 <decimal_send>
- 16a:	63 95       	inc	r22
- 16c:	54 56       	subi	r21, 0x64	; 100
- 16e:	fb cf       	rjmp	.-10     	; 0x166 <hundreds>
+00000166 <uartSendHex>:
+ 166:	11 24       	eor	r1, r1
+ 168:	04 d0       	rcall	.+8      	; 0x172 <high_hex>
+ 16a:	d4 df       	rcall	.-88     	; 0x114 <resetZHex>
+ 16c:	0b d0       	rcall	.+22     	; 0x184 <low_hex>
+ 16e:	d2 df       	rcall	.-92     	; 0x114 <resetZHex>
+ 170:	08 95       	ret
 
-00000170 <tens>:
- 170:	5a 30       	cpi	r21, 0x0A	; 10
- 172:	70 f0       	brcs	.+28     	; 0x190 <decimal_send>
- 174:	63 95       	inc	r22
- 176:	5a 50       	subi	r21, 0x0A	; 10
- 178:	fb cf       	rjmp	.-10     	; 0x170 <tens>
+00000172 <high_hex>:
+ 172:	65 2f       	mov	r22, r21
+ 174:	cf df       	rcall	.-98     	; 0x114 <resetZHex>
+ 176:	62 95       	swap	r22
+ 178:	6f 70       	andi	r22, 0x0F	; 15
+ 17a:	e6 0f       	add	r30, r22
+ 17c:	f1 1d       	adc	r31, r1
+ 17e:	94 91       	lpm	r25, Z
+ 180:	d9 df       	rcall	.-78     	; 0x134 <uartSend>
+ 182:	08 95       	ret
 
-0000017a <ones>:
- 17a:	51 30       	cpi	r21, 0x01	; 1
- 17c:	48 f0       	brcs	.+18     	; 0x190 <decimal_send>
- 17e:	63 95       	inc	r22
- 180:	51 50       	subi	r21, 0x01	; 1
- 182:	fb cf       	rjmp	.-10     	; 0x17a <ones>
+00000184 <low_hex>:
+ 184:	65 2f       	mov	r22, r21
+ 186:	c6 df       	rcall	.-116    	; 0x114 <resetZHex>
+ 188:	6f 70       	andi	r22, 0x0F	; 15
+ 18a:	e6 0f       	add	r30, r22
+ 18c:	f1 1d       	adc	r31, r1
+ 18e:	94 91       	lpm	r25, Z
+ 190:	d1 df       	rcall	.-94     	; 0x134 <uartSend>
+ 192:	08 95       	ret
 
-00000184 <if_zero>:
- 184:	55 23       	and	r21, r21
- 186:	09 f0       	breq	.+2      	; 0x18a <is_zero>
- 188:	ea cf       	rjmp	.-44     	; 0x15e <continue>
+00000194 <uartSendDec>:
+ 194:	13 d0       	rcall	.+38     	; 0x1bc <if_zero>
 
-0000018a <is_zero>:
- 18a:	90 e3       	ldi	r25, 0x30	; 48
- 18c:	b7 df       	rcall	.-146    	; 0xfc <uartSend>
- 18e:	e7 cf       	rjmp	.-50     	; 0x15e <continue>
+00000196 <continue>:
+ 196:	1d d0       	rcall	.+58     	; 0x1d2 <send_decimal>
+ 198:	90 e2       	ldi	r25, 0x20	; 32
+ 19a:	cc df       	rcall	.-104    	; 0x134 <uartSend>
+ 19c:	08 95       	ret
 
-00000190 <decimal_send>:
- 190:	60 5d       	subi	r22, 0xD0	; 208
- 192:	96 2f       	mov	r25, r22
- 194:	b3 df       	rcall	.-154    	; 0xfc <uartSend>
- 196:	66 27       	eor	r22, r22
- 198:	00 c0       	rjmp	.+0      	; 0x19a <send_decimal>
+0000019e <hundreds>:
+ 19e:	54 36       	cpi	r21, 0x64	; 100
+ 1a0:	98 f0       	brcs	.+38     	; 0x1c8 <decimal_send>
+ 1a2:	63 95       	inc	r22
+ 1a4:	54 56       	subi	r21, 0x64	; 100
+ 1a6:	fb cf       	rjmp	.-10     	; 0x19e <hundreds>
 
-0000019a <send_decimal>:
- 19a:	54 36       	cpi	r21, 0x64	; 100
- 19c:	20 f7       	brcc	.-56     	; 0x166 <hundreds>
- 19e:	5a 30       	cpi	r21, 0x0A	; 10
- 1a0:	38 f7       	brcc	.-50     	; 0x170 <tens>
- 1a2:	51 30       	cpi	r21, 0x01	; 1
- 1a4:	50 f7       	brcc	.-44     	; 0x17a <ones>
- 1a6:	08 95       	ret
+000001a8 <tens>:
+ 1a8:	5a 30       	cpi	r21, 0x0A	; 10
+ 1aa:	70 f0       	brcs	.+28     	; 0x1c8 <decimal_send>
+ 1ac:	63 95       	inc	r22
+ 1ae:	5a 50       	subi	r21, 0x0A	; 10
+ 1b0:	fb cf       	rjmp	.-10     	; 0x1a8 <tens>
 
-000001a8 <hex_list>:
- 1a8:	30 31       	cpi	r19, 0x10	; 16
- 1aa:	32 33       	cpi	r19, 0x32	; 50
- 1ac:	34 35       	cpi	r19, 0x54	; 84
- 1ae:	36 37       	cpi	r19, 0x76	; 118
- 1b0:	38 39       	cpi	r19, 0x98	; 152
- 1b2:	41 42       	sbci	r20, 0x21	; 33
- 1b4:	43 44       	sbci	r20, 0x43	; 67
- 1b6:	45 46       	sbci	r20, 0x65	; 101
+000001b2 <ones>:
+ 1b2:	51 30       	cpi	r21, 0x01	; 1
+ 1b4:	48 f0       	brcs	.+18     	; 0x1c8 <decimal_send>
+ 1b6:	63 95       	inc	r22
+ 1b8:	51 50       	subi	r21, 0x01	; 1
+ 1ba:	fb cf       	rjmp	.-10     	; 0x1b2 <ones>
 
-000001b8 <terminalInit>:
- 1b8:	2b d0       	rcall	.+86     	; 0x210 <terminalColorBG>
- 1ba:	35 d0       	rcall	.+106    	; 0x226 <terminalColorTXT>
- 1bc:	09 d0       	rcall	.+18     	; 0x1d0 <terminalClear>
- 1be:	11 d0       	rcall	.+34     	; 0x1e2 <terminalPrompt>
- 1c0:	08 95       	ret
+000001bc <if_zero>:
+ 1bc:	55 23       	and	r21, r21
+ 1be:	09 f0       	breq	.+2      	; 0x1c2 <is_zero>
+ 1c0:	ea cf       	rjmp	.-44     	; 0x196 <continue>
 
-000001c2 <terminalBackspace>:
- 1c2:	98 e0       	ldi	r25, 0x08	; 8
- 1c4:	9b df       	rcall	.-202    	; 0xfc <uartSend>
- 1c6:	90 e2       	ldi	r25, 0x20	; 32
- 1c8:	99 df       	rcall	.-206    	; 0xfc <uartSend>
- 1ca:	98 e0       	ldi	r25, 0x08	; 8
- 1cc:	97 df       	rcall	.-210    	; 0xfc <uartSend>
- 1ce:	08 95       	ret
+000001c2 <is_zero>:
+ 1c2:	90 e3       	ldi	r25, 0x30	; 48
+ 1c4:	b7 df       	rcall	.-146    	; 0x134 <uartSend>
+ 1c6:	e7 cf       	rjmp	.-50     	; 0x196 <continue>
 
-000001d0 <terminalClear>:
- 1d0:	9b e1       	ldi	r25, 0x1B	; 27
- 1d2:	94 df       	rcall	.-216    	; 0xfc <uartSend>
- 1d4:	9b e5       	ldi	r25, 0x5B	; 91
- 1d6:	92 df       	rcall	.-220    	; 0xfc <uartSend>
- 1d8:	92 e3       	ldi	r25, 0x32	; 50
- 1da:	90 df       	rcall	.-224    	; 0xfc <uartSend>
- 1dc:	9a e4       	ldi	r25, 0x4A	; 74
- 1de:	8e df       	rcall	.-228    	; 0xfc <uartSend>
- 1e0:	08 95       	ret
+000001c8 <decimal_send>:
+ 1c8:	60 5d       	subi	r22, 0xD0	; 208
+ 1ca:	96 2f       	mov	r25, r22
+ 1cc:	b3 df       	rcall	.-154    	; 0x134 <uartSend>
+ 1ce:	66 27       	eor	r22, r22
+ 1d0:	00 c0       	rjmp	.+0      	; 0x1d2 <send_decimal>
 
-000001e2 <terminalPrompt>:
- 1e2:	91 e6       	ldi	r25, 0x61	; 97
- 1e4:	8b df       	rcall	.-234    	; 0xfc <uartSend>
- 1e6:	96 e7       	ldi	r25, 0x76	; 118
- 1e8:	89 df       	rcall	.-238    	; 0xfc <uartSend>
- 1ea:	92 e7       	ldi	r25, 0x72	; 114
- 1ec:	87 df       	rcall	.-242    	; 0xfc <uartSend>
- 1ee:	9e e3       	ldi	r25, 0x3E	; 62
- 1f0:	85 df       	rcall	.-246    	; 0xfc <uartSend>
- 1f2:	08 95       	ret
+000001d2 <send_decimal>:
+ 1d2:	54 36       	cpi	r21, 0x64	; 100
+ 1d4:	20 f7       	brcc	.-56     	; 0x19e <hundreds>
+ 1d6:	5a 30       	cpi	r21, 0x0A	; 10
+ 1d8:	38 f7       	brcc	.-50     	; 0x1a8 <tens>
+ 1da:	51 30       	cpi	r21, 0x01	; 1
+ 1dc:	50 f7       	brcc	.-44     	; 0x1b2 <ones>
+ 1de:	08 95       	ret
 
-000001f4 <terminalEnter>:
- 1f4:	02 d0       	rcall	.+4      	; 0x1fa <terminalNewLine>
- 1f6:	f5 df       	rcall	.-22     	; 0x1e2 <terminalPrompt>
+000001e0 <hex_list>:
+ 1e0:	30 31       	cpi	r19, 0x10	; 16
+ 1e2:	32 33       	cpi	r19, 0x32	; 50
+ 1e4:	34 35       	cpi	r19, 0x54	; 84
+ 1e6:	36 37       	cpi	r19, 0x76	; 118
+ 1e8:	38 39       	cpi	r19, 0x98	; 152
+ 1ea:	41 42       	sbci	r20, 0x21	; 33
+ 1ec:	43 44       	sbci	r20, 0x43	; 67
+ 1ee:	45 46       	sbci	r20, 0x65	; 101
+
+000001f0 <terminalInit>:
+ 1f0:	2b d0       	rcall	.+86     	; 0x248 <terminalColorBG>
+ 1f2:	35 d0       	rcall	.+106    	; 0x25e <terminalColorTXT>
+ 1f4:	09 d0       	rcall	.+18     	; 0x208 <terminalClear>
+ 1f6:	11 d0       	rcall	.+34     	; 0x21a <terminalPrompt>
  1f8:	08 95       	ret
 
-000001fa <terminalNewLine>:
- 1fa:	9a e0       	ldi	r25, 0x0A	; 10
- 1fc:	7f df       	rcall	.-258    	; 0xfc <uartSend>
- 1fe:	9d e0       	ldi	r25, 0x0D	; 13
- 200:	7d df       	rcall	.-262    	; 0xfc <uartSend>
- 202:	9b e1       	ldi	r25, 0x1B	; 27
- 204:	7b df       	rcall	.-266    	; 0xfc <uartSend>
- 206:	9b e5       	ldi	r25, 0x5B	; 91
- 208:	79 df       	rcall	.-270    	; 0xfc <uartSend>
- 20a:	9b e4       	ldi	r25, 0x4B	; 75
- 20c:	77 df       	rcall	.-274    	; 0xfc <uartSend>
- 20e:	08 95       	ret
+000001fa <terminalBackspace>:
+ 1fa:	98 e0       	ldi	r25, 0x08	; 8
+ 1fc:	9b df       	rcall	.-202    	; 0x134 <uartSend>
+ 1fe:	90 e2       	ldi	r25, 0x20	; 32
+ 200:	99 df       	rcall	.-206    	; 0x134 <uartSend>
+ 202:	98 e0       	ldi	r25, 0x08	; 8
+ 204:	97 df       	rcall	.-210    	; 0x134 <uartSend>
+ 206:	08 95       	ret
 
-00000210 <terminalColorBG>:
- 210:	9b e1       	ldi	r25, 0x1B	; 27
- 212:	74 df       	rcall	.-280    	; 0xfc <uartSend>
- 214:	9b e5       	ldi	r25, 0x5B	; 91
- 216:	72 df       	rcall	.-284    	; 0xfc <uartSend>
- 218:	94 e3       	ldi	r25, 0x34	; 52
- 21a:	70 df       	rcall	.-288    	; 0xfc <uartSend>
- 21c:	94 e3       	ldi	r25, 0x34	; 52
- 21e:	6e df       	rcall	.-292    	; 0xfc <uartSend>
- 220:	9d e6       	ldi	r25, 0x6D	; 109
- 222:	6c df       	rcall	.-296    	; 0xfc <uartSend>
- 224:	08 95       	ret
+00000208 <terminalClear>:
+ 208:	9b e1       	ldi	r25, 0x1B	; 27
+ 20a:	94 df       	rcall	.-216    	; 0x134 <uartSend>
+ 20c:	9b e5       	ldi	r25, 0x5B	; 91
+ 20e:	92 df       	rcall	.-220    	; 0x134 <uartSend>
+ 210:	92 e3       	ldi	r25, 0x32	; 50
+ 212:	90 df       	rcall	.-224    	; 0x134 <uartSend>
+ 214:	9a e4       	ldi	r25, 0x4A	; 74
+ 216:	8e df       	rcall	.-228    	; 0x134 <uartSend>
+ 218:	08 95       	ret
 
-00000226 <terminalColorTXT>:
- 226:	9b e1       	ldi	r25, 0x1B	; 27
- 228:	69 df       	rcall	.-302    	; 0xfc <uartSend>
- 22a:	9b e5       	ldi	r25, 0x5B	; 91
- 22c:	67 df       	rcall	.-306    	; 0xfc <uartSend>
- 22e:	99 e3       	ldi	r25, 0x39	; 57
- 230:	65 df       	rcall	.-310    	; 0xfc <uartSend>
- 232:	97 e3       	ldi	r25, 0x37	; 55
- 234:	63 df       	rcall	.-314    	; 0xfc <uartSend>
- 236:	9d e6       	ldi	r25, 0x6D	; 109
- 238:	61 df       	rcall	.-318    	; 0xfc <uartSend>
- 23a:	08 95       	ret
+0000021a <terminalPrompt>:
+ 21a:	91 e6       	ldi	r25, 0x61	; 97
+ 21c:	8b df       	rcall	.-234    	; 0x134 <uartSend>
+ 21e:	96 e7       	ldi	r25, 0x76	; 118
+ 220:	89 df       	rcall	.-238    	; 0x134 <uartSend>
+ 222:	92 e7       	ldi	r25, 0x72	; 114
+ 224:	87 df       	rcall	.-242    	; 0x134 <uartSend>
+ 226:	9e e3       	ldi	r25, 0x3E	; 62
+ 228:	85 df       	rcall	.-246    	; 0x134 <uartSend>
+ 22a:	08 95       	ret
 
-0000023c <setZHelpMessage>:
- 23c:	f2 e0       	ldi	r31, 0x02	; 2
- 23e:	e8 e5       	ldi	r30, 0x58	; 88
- 240:	08 95       	ret
+0000022c <terminalEnter>:
+ 22c:	02 d0       	rcall	.+4      	; 0x232 <terminalNewLine>
+ 22e:	f5 df       	rcall	.-22     	; 0x21a <terminalPrompt>
+ 230:	08 95       	ret
 
-00000242 <helpCommand>:
- 242:	fc df       	rcall	.-8      	; 0x23c <setZHelpMessage>
+00000232 <terminalNewLine>:
+ 232:	9a e0       	ldi	r25, 0x0A	; 10
+ 234:	7f df       	rcall	.-258    	; 0x134 <uartSend>
+ 236:	9d e0       	ldi	r25, 0x0D	; 13
+ 238:	7d df       	rcall	.-262    	; 0x134 <uartSend>
+ 23a:	9b e1       	ldi	r25, 0x1B	; 27
+ 23c:	7b df       	rcall	.-266    	; 0x134 <uartSend>
+ 23e:	9b e5       	ldi	r25, 0x5B	; 91
+ 240:	79 df       	rcall	.-270    	; 0x134 <uartSend>
+ 242:	9b e4       	ldi	r25, 0x4B	; 75
+ 244:	77 df       	rcall	.-274    	; 0x134 <uartSend>
+ 246:	08 95       	ret
 
-00000244 <loop1>:
- 244:	95 91       	lpm	r25, Z+
- 246:	90 30       	cpi	r25, 0x00	; 0
- 248:	21 f0       	breq	.+8      	; 0x252 <done1>
- 24a:	9d 30       	cpi	r25, 0x0D	; 13
- 24c:	19 f0       	breq	.+6      	; 0x254 <newLine1>
- 24e:	56 df       	rcall	.-340    	; 0xfc <uartSend>
- 250:	f9 cf       	rjmp	.-14     	; 0x244 <loop1>
+00000248 <terminalColorBG>:
+ 248:	9b e1       	ldi	r25, 0x1B	; 27
+ 24a:	74 df       	rcall	.-280    	; 0x134 <uartSend>
+ 24c:	9b e5       	ldi	r25, 0x5B	; 91
+ 24e:	72 df       	rcall	.-284    	; 0x134 <uartSend>
+ 250:	94 e3       	ldi	r25, 0x34	; 52
+ 252:	70 df       	rcall	.-288    	; 0x134 <uartSend>
+ 254:	94 e3       	ldi	r25, 0x34	; 52
+ 256:	6e df       	rcall	.-292    	; 0x134 <uartSend>
+ 258:	9d e6       	ldi	r25, 0x6D	; 109
+ 25a:	6c df       	rcall	.-296    	; 0x134 <uartSend>
+ 25c:	08 95       	ret
 
-00000252 <done1>:
- 252:	08 95       	ret
+0000025e <terminalColorTXT>:
+ 25e:	9b e1       	ldi	r25, 0x1B	; 27
+ 260:	69 df       	rcall	.-302    	; 0x134 <uartSend>
+ 262:	9b e5       	ldi	r25, 0x5B	; 91
+ 264:	67 df       	rcall	.-306    	; 0x134 <uartSend>
+ 266:	99 e3       	ldi	r25, 0x39	; 57
+ 268:	65 df       	rcall	.-310    	; 0x134 <uartSend>
+ 26a:	97 e3       	ldi	r25, 0x37	; 55
+ 26c:	63 df       	rcall	.-314    	; 0x134 <uartSend>
+ 26e:	9d e6       	ldi	r25, 0x6D	; 109
+ 270:	61 df       	rcall	.-318    	; 0x134 <uartSend>
+ 272:	08 95       	ret
 
-00000254 <newLine1>:
- 254:	d2 df       	rcall	.-92     	; 0x1fa <terminalNewLine>
- 256:	f6 cf       	rjmp	.-20     	; 0x244 <loop1>
+00000274 <setZHelpMessage>:
+ 274:	f2 e0       	ldi	r31, 0x02	; 2
+ 276:	e0 e9       	ldi	r30, 0x90	; 144
+ 278:	08 95       	ret
 
-00000258 <helpMessage>:
- 258:	68 65       	ori	r22, 0x58	; 88
- 25a:	6c 70       	andi	r22, 0x0C	; 12
- 25c:	20 2d       	mov	r18, r0
- 25e:	20 64       	ori	r18, 0x40	; 64
- 260:	69 73       	andi	r22, 0x39	; 57
- 262:	70 6c       	ori	r23, 0xC0	; 192
- 264:	61 79       	andi	r22, 0x91	; 145
- 266:	20 74       	andi	r18, 0x40	; 64
- 268:	68 69       	ori	r22, 0x98	; 152
- 26a:	73 20       	and	r7, r3
- 26c:	6c 69       	ori	r22, 0x9C	; 156
- 26e:	73 74       	andi	r23, 0x43	; 67
- 270:	0d 69       	ori	r16, 0x9D	; 157
- 272:	6e 66       	ori	r22, 0x6E	; 110
- 274:	6f 20       	and	r6, r15
- 276:	2d 20       	and	r2, r13
- 278:	64 69       	ori	r22, 0x94	; 148
- 27a:	73 70       	andi	r23, 0x03	; 3
- 27c:	6c 61       	ori	r22, 0x1C	; 28
- 27e:	79 20       	and	r7, r9
- 280:	73 79       	andi	r23, 0x93	; 147
- 282:	73 74       	andi	r23, 0x43	; 67
- 284:	65 6d       	ori	r22, 0xD5	; 213
- 286:	20 69       	ori	r18, 0x90	; 144
- 288:	6e 66       	ori	r22, 0x6E	; 110
- 28a:	6f 0d       	add	r22, r15
- 28c:	72 65       	ori	r23, 0x52	; 82
- 28e:	67 73       	andi	r22, 0x37	; 55
- 290:	20 2d       	mov	r18, r0
- 292:	20 64       	ori	r18, 0x40	; 64
- 294:	69 73       	andi	r22, 0x39	; 57
- 296:	70 6c       	ori	r23, 0xC0	; 192
- 298:	61 79       	andi	r22, 0x91	; 145
- 29a:	20 61       	ori	r18, 0x10	; 16
- 29c:	6c 6c       	ori	r22, 0xCC	; 204
- 29e:	20 72       	andi	r18, 0x20	; 32
- 2a0:	65 67       	ori	r22, 0x75	; 117
- 2a2:	69 73       	andi	r22, 0x39	; 57
- 2a4:	74 65       	ori	r23, 0x54	; 84
- 2a6:	72 20       	and	r7, r2
- 2a8:	76 61       	ori	r23, 0x16	; 22
- 2aa:	6c 75       	andi	r22, 0x5C	; 92
- 2ac:	65 73       	andi	r22, 0x35	; 53
- 2ae:	0d 63       	ori	r16, 0x3D	; 61
- 2b0:	6c 65       	ori	r22, 0x5C	; 92
- 2b2:	61 72       	andi	r22, 0x21	; 33
- 2b4:	20 2d       	mov	r18, r0
- 2b6:	20 63       	ori	r18, 0x30	; 48
- 2b8:	6c 65       	ori	r22, 0x5C	; 92
- 2ba:	61 72       	andi	r22, 0x21	; 33
- 2bc:	20 64       	ori	r18, 0x40	; 64
- 2be:	69 73       	andi	r22, 0x39	; 57
- 2c0:	70 6c       	ori	r23, 0xC0	; 192
- 2c2:	61 79       	andi	r22, 0x91	; 145
- 2c4:	0d 65       	ori	r16, 0x5D	; 93
- 2c6:	63 68       	ori	r22, 0x83	; 131
- 2c8:	6f 20       	and	r6, r15
- 2ca:	2d 20       	and	r2, r13
- 2cc:	70 72       	andi	r23, 0x20	; 32
- 2ce:	69 6e       	ori	r22, 0xE9	; 233
- 2d0:	74 20       	and	r7, r4
- 2d2:	61 72       	andi	r22, 0x21	; 33
- 2d4:	67 75       	andi	r22, 0x57	; 87
- 2d6:	6d 65       	ori	r22, 0x5D	; 93
- 2d8:	6e 74       	andi	r22, 0x4E	; 78
- 2da:	0d 6d       	ori	r16, 0xDD	; 221
- 2dc:	72 65       	ori	r23, 0x52	; 82
- 2de:	61 64       	ori	r22, 0x41	; 65
- 2e0:	20 2d       	mov	r18, r0
- 2e2:	20 72       	andi	r18, 0x20	; 32
- 2e4:	65 61       	ori	r22, 0x15	; 21
- 2e6:	64 20       	and	r6, r4
- 2e8:	64 61       	ori	r22, 0x14	; 20
- 2ea:	74 61       	ori	r23, 0x14	; 20
- 2ec:	20 6d       	ori	r18, 0xD0	; 208
- 2ee:	65 6d       	ori	r22, 0xD5	; 213
- 2f0:	6f 72       	andi	r22, 0x2F	; 47
- 2f2:	79 28       	or	r7, r9
- 2f4:	63 68       	ori	r22, 0x83	; 131
- 2f6:	65 63       	ori	r22, 0x35	; 53
- 2f8:	6b 20       	and	r6, r11
- 2fa:	49 4e       	sbci	r20, 0xE9	; 233
- 2fc:	53 54       	subi	r21, 0x43	; 67
- 2fe:	52 55       	subi	r21, 0x52	; 82
- 300:	43 54       	subi	r20, 0x43	; 67
- 302:	49 4f       	sbci	r20, 0xF9	; 249
- 304:	4e 53       	subi	r20, 0x3E	; 62
- 306:	2e 6d       	ori	r18, 0xDE	; 222
- 308:	64 29       	or	r22, r4
- 30a:	0d 6d       	ori	r16, 0xDD	; 221
- 30c:	77 72       	andi	r23, 0x27	; 39
- 30e:	69 74       	andi	r22, 0x49	; 73
- 310:	65 20       	and	r6, r5
- 312:	2d 20       	and	r2, r13
- 314:	77 72       	andi	r23, 0x27	; 39
- 316:	69 74       	andi	r22, 0x49	; 73
- 318:	65 20       	and	r6, r5
- 31a:	74 6f       	ori	r23, 0xF4	; 244
- 31c:	20 64       	ori	r18, 0x40	; 64
- 31e:	61 74       	andi	r22, 0x41	; 65
- 320:	61 20       	and	r6, r1
- 322:	6d 65       	ori	r22, 0x5D	; 93
- 324:	6d 6f       	ori	r22, 0xFD	; 253
- 326:	72 79       	andi	r23, 0x92	; 146
- 328:	28 63       	ori	r18, 0x38	; 56
- 32a:	68 65       	ori	r22, 0x58	; 88
- 32c:	63 6b       	ori	r22, 0xB3	; 179
- 32e:	20 49       	sbci	r18, 0x90	; 144
- 330:	4e 53       	subi	r20, 0x3E	; 62
- 332:	54 52       	subi	r21, 0x24	; 36
- 334:	55 43       	sbci	r21, 0x35	; 53
- 336:	54 49       	sbci	r21, 0x94	; 148
- 338:	4f 4e       	sbci	r20, 0xEF	; 239
- 33a:	53 2e       	mov	r5, r19
- 33c:	6d 64       	ori	r22, 0x4D	; 77
- 33e:	29 0d       	add	r18, r9
- 340:	69 6a       	ori	r22, 0xA9	; 169
- 342:	6d 70       	andi	r22, 0x0D	; 13
- 344:	20 2d       	mov	r18, r0
- 346:	20 69       	ori	r18, 0x90	; 144
- 348:	6e 64       	ori	r22, 0x4E	; 78
- 34a:	69 72       	andi	r22, 0x29	; 41
- 34c:	65 63       	ori	r22, 0x35	; 53
- 34e:	74 20       	and	r7, r4
- 350:	6a 75       	andi	r22, 0x5A	; 90
- 352:	6d 70       	andi	r22, 0x0D	; 13
- 354:	20 74       	andi	r18, 0x40	; 64
- 356:	6f 20       	and	r6, r15
- 358:	61 64       	ori	r22, 0x41	; 65
- 35a:	64 72       	andi	r22, 0x24	; 36
- 35c:	65 73       	andi	r22, 0x35	; 53
- 35e:	73 20       	and	r7, r3
- 360:	28 63       	ori	r18, 0x38	; 56
- 362:	68 65       	ori	r22, 0x58	; 88
- 364:	63 6b       	ori	r22, 0xB3	; 179
- 366:	20 49       	sbci	r18, 0x90	; 144
- 368:	4e 53       	subi	r20, 0x3E	; 62
- 36a:	54 52       	subi	r21, 0x24	; 36
- 36c:	55 43       	sbci	r21, 0x35	; 53
- 36e:	54 49       	sbci	r21, 0x94	; 148
- 370:	4f 4e       	sbci	r20, 0xEF	; 239
- 372:	53 2e       	mov	r5, r19
- 374:	6d 64       	ori	r22, 0x4D	; 77
- 376:	29 00       	.word	0x0029	; ????
+0000027a <helpCommand>:
+ 27a:	fc df       	rcall	.-8      	; 0x274 <setZHelpMessage>
 
-00000378 <clearCommand>:
- 378:	2b df       	rcall	.-426    	; 0x1d0 <terminalClear>
- 37a:	08 95       	ret
+0000027c <loop1>:
+ 27c:	95 91       	lpm	r25, Z+
+ 27e:	90 30       	cpi	r25, 0x00	; 0
+ 280:	21 f0       	breq	.+8      	; 0x28a <done1>
+ 282:	9d 30       	cpi	r25, 0x0D	; 13
+ 284:	19 f0       	breq	.+6      	; 0x28c <newLine1>
+ 286:	56 df       	rcall	.-340    	; 0x134 <uartSend>
+ 288:	f9 cf       	rjmp	.-14     	; 0x27c <loop1>
 
-0000037c <setZInfoMessage>:
- 37c:	f3 e0       	ldi	r31, 0x03	; 3
- 37e:	e8 e9       	ldi	r30, 0x98	; 152
- 380:	08 95       	ret
+0000028a <done1>:
+ 28a:	08 95       	ret
 
-00000382 <infoCommand>:
- 382:	fc df       	rcall	.-8      	; 0x37c <setZInfoMessage>
+0000028c <newLine1>:
+ 28c:	d2 df       	rcall	.-92     	; 0x232 <terminalNewLine>
+ 28e:	f6 cf       	rjmp	.-20     	; 0x27c <loop1>
 
-00000384 <loop1>:
- 384:	95 91       	lpm	r25, Z+
- 386:	90 30       	cpi	r25, 0x00	; 0
- 388:	21 f0       	breq	.+8      	; 0x392 <done1>
- 38a:	9d 30       	cpi	r25, 0x0D	; 13
- 38c:	19 f0       	breq	.+6      	; 0x394 <newLine>
- 38e:	b6 de       	rcall	.-660    	; 0xfc <uartSend>
- 390:	f9 cf       	rjmp	.-14     	; 0x384 <loop1>
+00000290 <helpMessage>:
+ 290:	68 65       	ori	r22, 0x58	; 88
+ 292:	6c 70       	andi	r22, 0x0C	; 12
+ 294:	20 2d       	mov	r18, r0
+ 296:	20 64       	ori	r18, 0x40	; 64
+ 298:	69 73       	andi	r22, 0x39	; 57
+ 29a:	70 6c       	ori	r23, 0xC0	; 192
+ 29c:	61 79       	andi	r22, 0x91	; 145
+ 29e:	20 74       	andi	r18, 0x40	; 64
+ 2a0:	68 69       	ori	r22, 0x98	; 152
+ 2a2:	73 20       	and	r7, r3
+ 2a4:	6c 69       	ori	r22, 0x9C	; 156
+ 2a6:	73 74       	andi	r23, 0x43	; 67
+ 2a8:	0d 69       	ori	r16, 0x9D	; 157
+ 2aa:	6e 66       	ori	r22, 0x6E	; 110
+ 2ac:	6f 20       	and	r6, r15
+ 2ae:	2d 20       	and	r2, r13
+ 2b0:	64 69       	ori	r22, 0x94	; 148
+ 2b2:	73 70       	andi	r23, 0x03	; 3
+ 2b4:	6c 61       	ori	r22, 0x1C	; 28
+ 2b6:	79 20       	and	r7, r9
+ 2b8:	73 79       	andi	r23, 0x93	; 147
+ 2ba:	73 74       	andi	r23, 0x43	; 67
+ 2bc:	65 6d       	ori	r22, 0xD5	; 213
+ 2be:	20 69       	ori	r18, 0x90	; 144
+ 2c0:	6e 66       	ori	r22, 0x6E	; 110
+ 2c2:	6f 0d       	add	r22, r15
+ 2c4:	72 65       	ori	r23, 0x52	; 82
+ 2c6:	67 73       	andi	r22, 0x37	; 55
+ 2c8:	20 2d       	mov	r18, r0
+ 2ca:	20 64       	ori	r18, 0x40	; 64
+ 2cc:	69 73       	andi	r22, 0x39	; 57
+ 2ce:	70 6c       	ori	r23, 0xC0	; 192
+ 2d0:	61 79       	andi	r22, 0x91	; 145
+ 2d2:	20 61       	ori	r18, 0x10	; 16
+ 2d4:	6c 6c       	ori	r22, 0xCC	; 204
+ 2d6:	20 72       	andi	r18, 0x20	; 32
+ 2d8:	65 67       	ori	r22, 0x75	; 117
+ 2da:	69 73       	andi	r22, 0x39	; 57
+ 2dc:	74 65       	ori	r23, 0x54	; 84
+ 2de:	72 20       	and	r7, r2
+ 2e0:	76 61       	ori	r23, 0x16	; 22
+ 2e2:	6c 75       	andi	r22, 0x5C	; 92
+ 2e4:	65 73       	andi	r22, 0x35	; 53
+ 2e6:	0d 63       	ori	r16, 0x3D	; 61
+ 2e8:	6c 65       	ori	r22, 0x5C	; 92
+ 2ea:	61 72       	andi	r22, 0x21	; 33
+ 2ec:	20 2d       	mov	r18, r0
+ 2ee:	20 63       	ori	r18, 0x30	; 48
+ 2f0:	6c 65       	ori	r22, 0x5C	; 92
+ 2f2:	61 72       	andi	r22, 0x21	; 33
+ 2f4:	20 64       	ori	r18, 0x40	; 64
+ 2f6:	69 73       	andi	r22, 0x39	; 57
+ 2f8:	70 6c       	ori	r23, 0xC0	; 192
+ 2fa:	61 79       	andi	r22, 0x91	; 145
+ 2fc:	0d 65       	ori	r16, 0x5D	; 93
+ 2fe:	63 68       	ori	r22, 0x83	; 131
+ 300:	6f 20       	and	r6, r15
+ 302:	2d 20       	and	r2, r13
+ 304:	70 72       	andi	r23, 0x20	; 32
+ 306:	69 6e       	ori	r22, 0xE9	; 233
+ 308:	74 20       	and	r7, r4
+ 30a:	61 72       	andi	r22, 0x21	; 33
+ 30c:	67 75       	andi	r22, 0x57	; 87
+ 30e:	6d 65       	ori	r22, 0x5D	; 93
+ 310:	6e 74       	andi	r22, 0x4E	; 78
+ 312:	0d 6d       	ori	r16, 0xDD	; 221
+ 314:	72 65       	ori	r23, 0x52	; 82
+ 316:	61 64       	ori	r22, 0x41	; 65
+ 318:	20 2d       	mov	r18, r0
+ 31a:	20 72       	andi	r18, 0x20	; 32
+ 31c:	65 61       	ori	r22, 0x15	; 21
+ 31e:	64 20       	and	r6, r4
+ 320:	64 61       	ori	r22, 0x14	; 20
+ 322:	74 61       	ori	r23, 0x14	; 20
+ 324:	20 6d       	ori	r18, 0xD0	; 208
+ 326:	65 6d       	ori	r22, 0xD5	; 213
+ 328:	6f 72       	andi	r22, 0x2F	; 47
+ 32a:	79 28       	or	r7, r9
+ 32c:	63 68       	ori	r22, 0x83	; 131
+ 32e:	65 63       	ori	r22, 0x35	; 53
+ 330:	6b 20       	and	r6, r11
+ 332:	52 45       	sbci	r21, 0x52	; 82
+ 334:	41 44       	sbci	r20, 0x41	; 65
+ 336:	4d 45       	sbci	r20, 0x5D	; 93
+ 338:	2e 6d       	ori	r18, 0xDE	; 222
+ 33a:	64 29       	or	r22, r4
+ 33c:	0d 6d       	ori	r16, 0xDD	; 221
+ 33e:	77 72       	andi	r23, 0x27	; 39
+ 340:	69 74       	andi	r22, 0x49	; 73
+ 342:	65 20       	and	r6, r5
+ 344:	2d 20       	and	r2, r13
+ 346:	77 72       	andi	r23, 0x27	; 39
+ 348:	69 74       	andi	r22, 0x49	; 73
+ 34a:	65 20       	and	r6, r5
+ 34c:	74 6f       	ori	r23, 0xF4	; 244
+ 34e:	20 64       	ori	r18, 0x40	; 64
+ 350:	61 74       	andi	r22, 0x41	; 65
+ 352:	61 20       	and	r6, r1
+ 354:	6d 65       	ori	r22, 0x5D	; 93
+ 356:	6d 6f       	ori	r22, 0xFD	; 253
+ 358:	72 79       	andi	r23, 0x92	; 146
+ 35a:	28 63       	ori	r18, 0x38	; 56
+ 35c:	68 65       	ori	r22, 0x58	; 88
+ 35e:	63 6b       	ori	r22, 0xB3	; 179
+ 360:	20 52       	subi	r18, 0x20	; 32
+ 362:	45 41       	sbci	r20, 0x15	; 21
+ 364:	44 4d       	sbci	r20, 0xD4	; 212
+ 366:	45 2e       	mov	r4, r21
+ 368:	6d 64       	ori	r22, 0x4D	; 77
+ 36a:	29 0d       	add	r18, r9
+ 36c:	69 6a       	ori	r22, 0xA9	; 169
+ 36e:	6d 70       	andi	r22, 0x0D	; 13
+ 370:	20 2d       	mov	r18, r0
+ 372:	20 69       	ori	r18, 0x90	; 144
+ 374:	6e 64       	ori	r22, 0x4E	; 78
+ 376:	69 72       	andi	r22, 0x29	; 41
+ 378:	65 63       	ori	r22, 0x35	; 53
+ 37a:	74 20       	and	r7, r4
+ 37c:	6a 75       	andi	r22, 0x5A	; 90
+ 37e:	6d 70       	andi	r22, 0x0D	; 13
+ 380:	20 74       	andi	r18, 0x40	; 64
+ 382:	6f 20       	and	r6, r15
+ 384:	61 64       	ori	r22, 0x41	; 65
+ 386:	64 72       	andi	r22, 0x24	; 36
+ 388:	65 73       	andi	r22, 0x35	; 53
+ 38a:	73 20       	and	r7, r3
+ 38c:	28 63       	ori	r18, 0x38	; 56
+ 38e:	68 65       	ori	r22, 0x58	; 88
+ 390:	63 6b       	ori	r22, 0xB3	; 179
+ 392:	20 52       	subi	r18, 0x20	; 32
+ 394:	45 41       	sbci	r20, 0x15	; 21
+ 396:	44 4d       	sbci	r20, 0xD4	; 212
+ 398:	45 2e       	mov	r4, r21
+ 39a:	6d 64       	ori	r22, 0x4D	; 77
+ 39c:	29 00       	.word	0x0029	; ????
 
-00000392 <done1>:
- 392:	08 95       	ret
+0000039e <clearCommand>:
+ 39e:	34 df       	rcall	.-408    	; 0x208 <terminalClear>
+ 3a0:	08 95       	ret
 
-00000394 <newLine>:
- 394:	32 df       	rcall	.-412    	; 0x1fa <terminalNewLine>
- 396:	f6 cf       	rjmp	.-20     	; 0x384 <loop1>
+000003a2 <setZInfoMessage>:
+ 3a2:	f3 e0       	ldi	r31, 0x03	; 3
+ 3a4:	ee eb       	ldi	r30, 0xBE	; 190
+ 3a6:	08 95       	ret
 
-00000398 <infoMessage>:
- 398:	20 20       	and	r2, r0
- 39a:	20 20       	and	r2, r0
- 39c:	20 20       	and	r2, r0
- 39e:	5f 09       	sbc	r21, r15
- 3a0:	20 20       	and	r2, r0
- 3a2:	20 20       	and	r2, r0
- 3a4:	20 20       	and	r2, r0
- 3a6:	20 20       	and	r2, r0
- 3a8:	5f 5f       	subi	r21, 0xFF	; 255
- 3aa:	5f 5f       	subi	r21, 0xFF	; 255
- 3ac:	5f 5f       	subi	r21, 0xFF	; 255
- 3ae:	5f 2e       	mov	r5, r31
- 3b0:	09 43       	sbci	r16, 0x39	; 57
- 3b2:	50 55       	subi	r21, 0x50	; 80
- 3b4:	3a 20       	and	r3, r10
- 3b6:	41 54       	subi	r20, 0x41	; 65
- 3b8:	6d 65       	ori	r22, 0x5D	; 93
- 3ba:	67 61       	ori	r22, 0x17	; 23
- 3bc:	33 32       	cpi	r19, 0x23	; 35
- 3be:	38 70       	andi	r19, 0x08	; 8
- 3c0:	0d 20       	and	r0, r13
+000003a8 <infoCommand>:
+ 3a8:	fc df       	rcall	.-8      	; 0x3a2 <setZInfoMessage>
+
+000003aa <loop1>:
+ 3aa:	95 91       	lpm	r25, Z+
+ 3ac:	90 30       	cpi	r25, 0x00	; 0
+ 3ae:	21 f0       	breq	.+8      	; 0x3b8 <done1>
+ 3b0:	9d 30       	cpi	r25, 0x0D	; 13
+ 3b2:	19 f0       	breq	.+6      	; 0x3ba <newLine>
+ 3b4:	bf de       	rcall	.-642    	; 0x134 <uartSend>
+ 3b6:	f9 cf       	rjmp	.-14     	; 0x3aa <loop1>
+
+000003b8 <done1>:
+ 3b8:	08 95       	ret
+
+000003ba <newLine>:
+ 3ba:	3b df       	rcall	.-394    	; 0x232 <terminalNewLine>
+ 3bc:	f6 cf       	rjmp	.-20     	; 0x3aa <loop1>
+
+000003be <infoMessage>:
+ 3be:	20 20       	and	r2, r0
+ 3c0:	20 20       	and	r2, r0
  3c2:	20 20       	and	r2, r0
- 3c4:	20 20       	and	r2, r0
- 3c6:	2f 40       	sbci	r18, 0x0F	; 15
- 3c8:	2e 20       	and	r2, r14
+ 3c4:	5f 09       	sbc	r21, r15
+ 3c6:	20 20       	and	r2, r0
+ 3c8:	20 20       	and	r2, r0
  3ca:	20 20       	and	r2, r0
  3cc:	20 20       	and	r2, r0
- 3ce:	20 20       	and	r2, r0
- 3d0:	2f 40       	sbci	r18, 0x0F	; 15
- 3d2:	40 40       	sbci	r20, 0x00	; 0
- 3d4:	40 40       	sbci	r20, 0x00	; 0
- 3d6:	40 40       	sbci	r20, 0x00	; 0
- 3d8:	40 2e       	mov	r4, r16
- 3da:	09 53       	subi	r16, 0x39	; 57
- 3dc:	52 41       	sbci	r21, 0x12	; 18
- 3de:	4d 3a       	cpi	r20, 0xAD	; 173
- 3e0:	20 32       	cpi	r18, 0x20	; 32
- 3e2:	4b 42       	sbci	r20, 0x2B	; 43
- 3e4:	0d 20       	and	r0, r13
- 3e6:	20 20       	and	r2, r0
- 3e8:	20 2f       	mov	r18, r16
- 3ea:	40 5e       	subi	r20, 0xE0	; 224
- 3ec:	40 2e       	mov	r4, r16
- 3ee:	20 20       	and	r2, r0
+ 3ce:	5f 5f       	subi	r21, 0xFF	; 255
+ 3d0:	5f 5f       	subi	r21, 0xFF	; 255
+ 3d2:	5f 5f       	subi	r21, 0xFF	; 255
+ 3d4:	5f 2e       	mov	r5, r31
+ 3d6:	09 43       	sbci	r16, 0x39	; 57
+ 3d8:	50 55       	subi	r21, 0x50	; 80
+ 3da:	3a 20       	and	r3, r10
+ 3dc:	41 54       	subi	r20, 0x41	; 65
+ 3de:	6d 65       	ori	r22, 0x5D	; 93
+ 3e0:	67 61       	ori	r22, 0x17	; 23
+ 3e2:	33 32       	cpi	r19, 0x23	; 35
+ 3e4:	38 70       	andi	r19, 0x08	; 8
+ 3e6:	0d 20       	and	r0, r13
+ 3e8:	20 20       	and	r2, r0
+ 3ea:	20 20       	and	r2, r0
+ 3ec:	2f 40       	sbci	r18, 0x0F	; 15
+ 3ee:	2e 20       	and	r2, r14
  3f0:	20 20       	and	r2, r0
- 3f2:	20 2f       	mov	r18, r16
- 3f4:	40 2f       	mov	r20, r16
- 3f6:	60 60       	ori	r22, 0x00	; 0
- 3f8:	60 60       	ori	r22, 0x00	; 0
- 3fa:	60 60       	ori	r22, 0x00	; 0
+ 3f2:	20 20       	and	r2, r0
+ 3f4:	20 20       	and	r2, r0
+ 3f6:	2f 40       	sbci	r18, 0x0F	; 15
+ 3f8:	40 40       	sbci	r20, 0x00	; 0
+ 3fa:	40 40       	sbci	r20, 0x00	; 0
  3fc:	40 40       	sbci	r20, 0x00	; 0
- 3fe:	2e 09       	sbc	r18, r14
- 400:	46 4c       	sbci	r20, 0xC6	; 198
- 402:	41 53       	subi	r20, 0x31	; 49
- 404:	48 3a       	cpi	r20, 0xA8	; 168
- 406:	20 33       	cpi	r18, 0x30	; 48
- 408:	32 4b       	sbci	r19, 0xB2	; 178
+ 3fe:	40 2e       	mov	r4, r16
+ 400:	09 53       	subi	r16, 0x39	; 57
+ 402:	52 41       	sbci	r21, 0x12	; 18
+ 404:	4d 3a       	cpi	r20, 0xAD	; 173
+ 406:	20 32       	cpi	r18, 0x20	; 32
+ 408:	4b 69       	ori	r20, 0x9B	; 155
  40a:	42 0d       	add	r20, r2
  40c:	20 20       	and	r2, r0
- 40e:	20 2f       	mov	r18, r16
- 410:	40 2f       	mov	r20, r16
- 412:	5f 60       	ori	r21, 0x0F	; 15
- 414:	40 2e       	mov	r4, r16
+ 40e:	20 20       	and	r2, r0
+ 410:	2f 40       	sbci	r18, 0x0F	; 15
+ 412:	5e 40       	sbci	r21, 0x0E	; 14
+ 414:	2e 20       	and	r2, r14
  416:	20 20       	and	r2, r0
- 418:	20 2f       	mov	r18, r16
- 41a:	40 40       	sbci	r20, 0x00	; 0
- 41c:	40 40       	sbci	r20, 0x00	; 0
- 41e:	40 40       	sbci	r20, 0x00	; 0
- 420:	40 40       	sbci	r20, 0x00	; 0
- 422:	40 40       	sbci	r20, 0x00	; 0
- 424:	2f 09       	sbc	r18, r15
- 426:	45 45       	sbci	r20, 0x55	; 85
- 428:	50 52       	subi	r21, 0x20	; 32
- 42a:	4f 4d       	sbci	r20, 0xDF	; 223
+ 418:	20 20       	and	r2, r0
+ 41a:	2f 40       	sbci	r18, 0x0F	; 15
+ 41c:	2f 60       	ori	r18, 0x0F	; 15
+ 41e:	60 60       	ori	r22, 0x00	; 0
+ 420:	60 60       	ori	r22, 0x00	; 0
+ 422:	60 40       	sbci	r22, 0x00	; 0
+ 424:	40 2e       	mov	r4, r16
+ 426:	09 46       	sbci	r16, 0x69	; 105
+ 428:	4c 41       	sbci	r20, 0x1C	; 28
+ 42a:	53 48       	sbci	r21, 0x83	; 131
  42c:	3a 20       	and	r3, r10
- 42e:	31 4b       	sbci	r19, 0xB1	; 177
- 430:	42 0d       	add	r20, r2
- 432:	20 20       	and	r2, r0
- 434:	2f 40       	sbci	r18, 0x0F	; 15
- 436:	40 40       	sbci	r20, 0x00	; 0
- 438:	40 40       	sbci	r20, 0x00	; 0
- 43a:	40 40       	sbci	r20, 0x00	; 0
- 43c:	2e 20       	and	r2, r14
- 43e:	2f 40       	sbci	r18, 0x0F	; 15
- 440:	40 40       	sbci	r20, 0x00	; 0
- 442:	40 2e       	mov	r4, r16
- 444:	60 60       	ori	r22, 0x00	; 0
- 446:	60 60       	ori	r22, 0x00	; 0
- 448:	60 60       	ori	r22, 0x00	; 0
- 44a:	09 41       	sbci	r16, 0x19	; 25
- 44c:	56 52       	subi	r21, 0x26	; 38
- 44e:	3a 20       	and	r3, r10
- 450:	31 30       	cpi	r19, 0x01	; 1
- 452:	30 25       	eor	r19, r0
- 454:	0d 20       	and	r0, r13
- 456:	2f 40       	sbci	r18, 0x0F	; 15
- 458:	2f 60       	ori	r18, 0x0F	; 15
- 45a:	60 60       	ori	r22, 0x00	; 0
- 45c:	60 60       	ori	r22, 0x00	; 0
+ 42e:	33 32       	cpi	r19, 0x23	; 35
+ 430:	4b 69       	ori	r20, 0x9B	; 155
+ 432:	42 0d       	add	r20, r2
+ 434:	20 20       	and	r2, r0
+ 436:	20 2f       	mov	r18, r16
+ 438:	40 2f       	mov	r20, r16
+ 43a:	5f 60       	ori	r21, 0x0F	; 15
+ 43c:	40 2e       	mov	r4, r16
+ 43e:	20 20       	and	r2, r0
+ 440:	20 2f       	mov	r18, r16
+ 442:	40 40       	sbci	r20, 0x00	; 0
+ 444:	40 40       	sbci	r20, 0x00	; 0
+ 446:	40 40       	sbci	r20, 0x00	; 0
+ 448:	40 40       	sbci	r20, 0x00	; 0
+ 44a:	40 40       	sbci	r20, 0x00	; 0
+ 44c:	2f 09       	sbc	r18, r15
+ 44e:	45 45       	sbci	r20, 0x55	; 85
+ 450:	50 52       	subi	r21, 0x20	; 32
+ 452:	4f 4d       	sbci	r20, 0xDF	; 223
+ 454:	3a 20       	and	r3, r10
+ 456:	31 4b       	sbci	r19, 0xB1	; 177
+ 458:	69 42       	sbci	r22, 0x29	; 41
+ 45a:	0d 20       	and	r0, r13
+ 45c:	20 2f       	mov	r18, r16
  45e:	40 40       	sbci	r20, 0x00	; 0
- 460:	56 40       	sbci	r21, 0x06	; 6
- 462:	2f 60       	ori	r18, 0x0F	; 15
- 464:	40 40       	sbci	r20, 0x00	; 0
- 466:	40 40       	sbci	r20, 0x00	; 0
- 468:	2e 09       	sbc	r18, r14
- 46a:	09 56       	subi	r16, 0x69	; 105
- 46c:	45 52       	subi	r20, 0x25	; 37
- 46e:	53 49       	sbci	r21, 0x93	; 147
- 470:	4f 4e       	sbci	r20, 0xEF	; 239
- 472:	3a 20       	and	r3, r10
- 474:	30 2e       	mov	r3, r16
- 476:	31 2e       	mov	r3, r17
- 478:	30 2d       	mov	r19, r0
- 47a:	61 6c       	ori	r22, 0xC1	; 193
- 47c:	70 68       	ori	r23, 0x80	; 128
- 47e:	61 0d       	add	r22, r1
- 480:	2f 40       	sbci	r18, 0x0F	; 15
- 482:	2f 20       	and	r2, r15
- 484:	20 20       	and	r2, r0
- 486:	20 20       	and	r2, r0
- 488:	20 60       	ori	r18, 0x00	; 0
- 48a:	40 40       	sbci	r20, 0x00	; 0
- 48c:	2f 20       	and	r2, r15
- 48e:	20 20       	and	r2, r0
- 490:	20 60       	ori	r18, 0x00	; 0
- 492:	40 40       	sbci	r20, 0x00	; 0
- 494:	40 40       	sbci	r20, 0x00	; 0
- 496:	2e 00       	.word	0x002e	; ????
-
-00000498 <bufferAdd>:
- 498:	07 d0       	rcall	.+14     	; 0x4a8 <incBL>
- 49a:	01 32       	cpi	r16, 0x21	; 33
- 49c:	e9 f0       	breq	.+58     	; 0x4d8 <overflow>
- 49e:	9d 93       	st	X+, r25
- 4a0:	08 95       	ret
-
-000004a2 <bufferDel>:
- 4a2:	07 d0       	rcall	.+14     	; 0x4b2 <decBL>
- 4a4:	11 97       	sbiw	r26, 0x01	; 1
- 4a6:	08 95       	ret
-
-000004a8 <incBL>:
- 4a8:	11 d0       	rcall	.+34     	; 0x4cc <setYBL>
- 4aa:	08 81       	ld	r16, Y
- 4ac:	03 95       	inc	r16
- 4ae:	08 83       	st	Y, r16
- 4b0:	08 95       	ret
-
-000004b2 <decBL>:
- 4b2:	0c d0       	rcall	.+24     	; 0x4cc <setYBL>
- 4b4:	08 81       	ld	r16, Y
- 4b6:	0a 95       	dec	r16
- 4b8:	08 83       	st	Y, r16
- 4ba:	08 95       	ret
-
-000004bc <bufferReset>:
- 4bc:	04 d0       	rcall	.+8      	; 0x4c6 <resetXBuffer>
- 4be:	06 d0       	rcall	.+12     	; 0x4cc <setYBL>
- 4c0:	00 e0       	ldi	r16, 0x00	; 0
- 4c2:	08 83       	st	Y, r16
- 4c4:	08 95       	ret
-
-000004c6 <resetXBuffer>:
- 4c6:	b1 e0       	ldi	r27, 0x01	; 1
- 4c8:	a0 e0       	ldi	r26, 0x00	; 0
- 4ca:	08 95       	ret
-
-000004cc <setYBL>:
- 4cc:	d1 e0       	ldi	r29, 0x01	; 1
- 4ce:	c0 e2       	ldi	r28, 0x20	; 32
- 4d0:	08 95       	ret
-
-000004d2 <setZErrorOverflow>:
- 4d2:	f4 e0       	ldi	r31, 0x04	; 4
- 4d4:	ee ee       	ldi	r30, 0xEE	; 238
- 4d6:	08 95       	ret
-
-000004d8 <overflow>:
- 4d8:	f1 df       	rcall	.-30     	; 0x4bc <bufferReset>
- 4da:	fb df       	rcall	.-10     	; 0x4d2 <setZErrorOverflow>
- 4dc:	8e de       	rcall	.-740    	; 0x1fa <terminalNewLine>
-
-000004de <loop1>:
- 4de:	95 91       	lpm	r25, Z+
- 4e0:	99 23       	and	r25, r25
- 4e2:	11 f0       	breq	.+4      	; 0x4e8 <done1>
- 4e4:	0b de       	rcall	.-1002   	; 0xfc <uartSend>
- 4e6:	fb cf       	rjmp	.-10     	; 0x4de <loop1>
-
-000004e8 <done1>:
- 4e8:	85 de       	rcall	.-758    	; 0x1f4 <terminalEnter>
- 4ea:	99 27       	eor	r25, r25
- 4ec:	08 95       	ret
-
-000004ee <errorOverflow>:
- 4ee:	45 52       	subi	r20, 0x25	; 37
- 4f0:	52 4f       	sbci	r21, 0xF2	; 242
- 4f2:	52 3a       	cpi	r21, 0xA2	; 162
- 4f4:	20 4f       	sbci	r18, 0xF0	; 240
- 4f6:	56 45       	sbci	r21, 0x56	; 86
- 4f8:	52 46       	sbci	r21, 0x62	; 98
- 4fa:	4c 4f       	sbci	r20, 0xFC	; 252
- 4fc:	57 20       	and	r5, r7
- 4fe:	33 32       	cpi	r19, 0x23	; 35
- 500:	20 63       	ori	r18, 0x30	; 48
- 502:	68 61       	ori	r22, 0x18	; 24
- 504:	72 61       	ori	r23, 0x12	; 18
- 506:	63 74       	andi	r22, 0x43	; 67
- 508:	65 72       	andi	r22, 0x25	; 37
- 50a:	20 6c       	ori	r18, 0xC0	; 192
- 50c:	69 6d       	ori	r22, 0xD9	; 217
- 50e:	69 74       	andi	r22, 0x49	; 73
- 510:	21 00       	.word	0x0021	; ????
-
-00000512 <parseCommand>:
- 512:	a3 d0       	rcall	.+326    	; 0x65a <restoreBL>
- 514:	04 30       	cpi	r16, 0x04	; 4
- 516:	09 f4       	brne	.+2      	; 0x51a <notChar4>
- 518:	58 c0       	rjmp	.+176    	; 0x5ca <char4>
-
-0000051a <notChar4>:
- 51a:	05 30       	cpi	r16, 0x05	; 5
- 51c:	09 f4       	brne	.+2      	; 0x520 <notChar5>
- 51e:	4b c0       	rjmp	.+150    	; 0x5b6 <char5>
-
-00000520 <notChar5>:
- 520:	09 30       	cpi	r16, 0x09	; 9
- 522:	09 f4       	brne	.+2      	; 0x526 <notChar9>
- 524:	41 c0       	rjmp	.+130    	; 0x5a8 <char9>
-
-00000526 <notChar9>:
- 526:	0a 30       	cpi	r16, 0x0A	; 10
- 528:	09 f4       	brne	.+2      	; 0x52c <notChar10>
- 52a:	37 c0       	rjmp	.+110    	; 0x59a <char10>
-
-0000052c <notChar10>:
- 52c:	0e 30       	cpi	r16, 0x0E	; 14
- 52e:	09 f4       	brne	.+2      	; 0x532 <notChar14>
- 530:	2d c0       	rjmp	.+90     	; 0x58c <char14>
-
-00000532 <notChar14>:
- 532:	00 c0       	rjmp	.+0      	; 0x534 <variableLength>
-
-00000534 <variableLength>:
- 534:	40 ef       	ldi	r20, 0xF0	; 240
- 536:	7f d0       	rcall	.+254    	; 0x636 <setZEcho0>
- 538:	05 e0       	ldi	r16, 0x05	; 5
- 53a:	60 d0       	rcall	.+192    	; 0x5fc <noRestoreBL>
- 53c:	31 30       	cpi	r19, 0x01	; 1
- 53e:	09 f4       	brne	.+2      	; 0x542 <notEcho>
- 540:	5a c0       	rjmp	.+180    	; 0x5f6 <done>
-
-00000542 <notEcho>:
- 542:	69 c0       	rjmp	.+210    	; 0x616 <invalidCommand>
-
-00000544 <mreadADDR>:
- 544:	12 e0       	ldi	r17, 0x02	; 2
- 546:	cc d1       	rcall	.+920    	; 0x8e0 <ahtoi>
- 548:	30 30       	cpi	r19, 0x00	; 0
- 54a:	e9 f4       	brne	.+58     	; 0x586 <invalidArgument>
- 54c:	54 c0       	rjmp	.+168    	; 0x5f6 <done>
-
-0000054e <mwriteADDR>:
- 54e:	12 e0       	ldi	r17, 0x02	; 2
- 550:	c7 d1       	rcall	.+910    	; 0x8e0 <ahtoi>
- 552:	30 30       	cpi	r19, 0x00	; 0
- 554:	c1 f4       	brne	.+48     	; 0x586 <invalidArgument>
- 556:	00 c0       	rjmp	.+0      	; 0x558 <mwriteADDR0>
-
-00000558 <mwriteADDR0>:
- 558:	7d d0       	rcall	.+250    	; 0x654 <setZSpace>
- 55a:	01 e0       	ldi	r16, 0x01	; 1
- 55c:	50 d0       	rcall	.+160    	; 0x5fe <check>
- 55e:	31 30       	cpi	r19, 0x01	; 1
- 560:	91 f4       	brne	.+36     	; 0x586 <invalidArgument>
- 562:	00 c0       	rjmp	.+0      	; 0x564 <mwriteADDR0VV>
-
-00000564 <mwriteADDR0VV>:
- 564:	cd 2e       	mov	r12, r29
- 566:	dc 2e       	mov	r13, r28
- 568:	11 e0       	ldi	r17, 0x01	; 1
- 56a:	ba d1       	rcall	.+884    	; 0x8e0 <ahtoi>
- 56c:	30 30       	cpi	r19, 0x00	; 0
- 56e:	59 f4       	brne	.+22     	; 0x586 <invalidArgument>
- 570:	dc 2d       	mov	r29, r12
- 572:	cd 2d       	mov	r28, r13
- 574:	40 c0       	rjmp	.+128    	; 0x5f6 <done>
-
-00000576 <ijmpADDR>:
- 576:	12 e0       	ldi	r17, 0x02	; 2
- 578:	b3 d1       	rcall	.+870    	; 0x8e0 <ahtoi>
- 57a:	30 30       	cpi	r19, 0x00	; 0
- 57c:	21 f4       	brne	.+8      	; 0x586 <invalidArgument>
- 57e:	fe 01       	movw	r30, r28
- 580:	f6 95       	lsr	r31
- 582:	e7 95       	ror	r30
- 584:	38 c0       	rjmp	.+112    	; 0x5f6 <done>
-
-00000586 <invalidArgument>:
- 586:	4d ef       	ldi	r20, 0xFD	; 253
- 588:	04 2e       	mov	r0, r20
- 58a:	08 95       	ret
-
-0000058c <char14>:
- 58c:	40 ec       	ldi	r20, 0xC0	; 192
- 58e:	5c d0       	rcall	.+184    	; 0x648 <setZMwrite>
- 590:	07 e0       	ldi	r16, 0x07	; 7
- 592:	34 d0       	rcall	.+104    	; 0x5fc <noRestoreBL>
- 594:	31 30       	cpi	r19, 0x01	; 1
- 596:	d9 f2       	breq	.-74     	; 0x54e <mwriteADDR>
- 598:	3e c0       	rjmp	.+124    	; 0x616 <invalidCommand>
-
-0000059a <char10>:
- 59a:	40 e8       	ldi	r20, 0x80	; 128
- 59c:	58 d0       	rcall	.+176    	; 0x64e <setZMread>
- 59e:	06 e0       	ldi	r16, 0x06	; 6
- 5a0:	2d d0       	rcall	.+90     	; 0x5fc <noRestoreBL>
- 5a2:	31 30       	cpi	r19, 0x01	; 1
- 5a4:	79 f2       	breq	.-98     	; 0x544 <mreadADDR>
- 5a6:	37 c0       	rjmp	.+110    	; 0x616 <invalidCommand>
-
-000005a8 <char9>:
- 5a8:	40 e7       	ldi	r20, 0x70	; 112
- 5aa:	4b d0       	rcall	.+150    	; 0x642 <setZIndirectJump>
- 5ac:	05 e0       	ldi	r16, 0x05	; 5
- 5ae:	26 d0       	rcall	.+76     	; 0x5fc <noRestoreBL>
- 5b0:	31 30       	cpi	r19, 0x01	; 1
- 5b2:	09 f3       	breq	.-62     	; 0x576 <ijmpADDR>
- 5b4:	30 c0       	rjmp	.+96     	; 0x616 <invalidCommand>
-
-000005b6 <char5>:
- 5b6:	40 e3       	ldi	r20, 0x30	; 48
- 5b8:	3b d0       	rcall	.+118    	; 0x630 <setZClear>
- 5ba:	1f d0       	rcall	.+62     	; 0x5fa <compareString>
- 5bc:	31 30       	cpi	r19, 0x01	; 1
- 5be:	d9 f0       	breq	.+54     	; 0x5f6 <done>
- 5c0:	3a d0       	rcall	.+116    	; 0x636 <setZEcho0>
- 5c2:	1b d0       	rcall	.+54     	; 0x5fa <compareString>
- 5c4:	31 30       	cpi	r19, 0x01	; 1
- 5c6:	99 f0       	breq	.+38     	; 0x5ee <handleEchoNoARG>
- 5c8:	26 c0       	rjmp	.+76     	; 0x616 <invalidCommand>
-
-000005ca <char4>:
- 5ca:	40 e2       	ldi	r20, 0x20	; 32
- 5cc:	28 d0       	rcall	.+80     	; 0x61e <setZHelp>
- 5ce:	15 d0       	rcall	.+42     	; 0x5fa <compareString>
- 5d0:	31 30       	cpi	r19, 0x01	; 1
- 5d2:	89 f0       	breq	.+34     	; 0x5f6 <done>
- 5d4:	27 d0       	rcall	.+78     	; 0x624 <setZInfo>
- 5d6:	11 d0       	rcall	.+34     	; 0x5fa <compareString>
- 5d8:	31 30       	cpi	r19, 0x01	; 1
- 5da:	69 f0       	breq	.+26     	; 0x5f6 <done>
- 5dc:	26 d0       	rcall	.+76     	; 0x62a <setZRegs>
- 5de:	0d d0       	rcall	.+26     	; 0x5fa <compareString>
- 5e0:	31 30       	cpi	r19, 0x01	; 1
- 5e2:	49 f0       	breq	.+18     	; 0x5f6 <done>
- 5e4:	2b d0       	rcall	.+86     	; 0x63c <setZEcho>
- 5e6:	09 d0       	rcall	.+18     	; 0x5fa <compareString>
- 5e8:	31 30       	cpi	r19, 0x01	; 1
- 5ea:	09 f0       	breq	.+2      	; 0x5ee <handleEchoNoARG>
- 5ec:	14 c0       	rjmp	.+40     	; 0x616 <invalidCommand>
-
-000005ee <handleEchoNoARG>:
- 5ee:	4e ef       	ldi	r20, 0xFE	; 254
- 5f0:	04 2e       	mov	r0, r20
- 5f2:	5e d1       	rcall	.+700    	; 0x8b0 <echoNoARG>
- 5f4:	08 95       	ret
-
-000005f6 <done>:
- 5f6:	04 2e       	mov	r0, r20
- 5f8:	08 95       	ret
-
-000005fa <compareString>:
- 5fa:	2f d0       	rcall	.+94     	; 0x65a <restoreBL>
-
-000005fc <noRestoreBL>:
- 5fc:	64 df       	rcall	.-312    	; 0x4c6 <resetXBuffer>
-
-000005fe <check>:
- 5fe:	1d 91       	ld	r17, X+
- 600:	25 91       	lpm	r18, Z+
- 602:	12 17       	cp	r17, r18
- 604:	29 f4       	brne	.+10     	; 0x610 <notMatch>
- 606:	0a 95       	dec	r16
- 608:	00 23       	and	r16, r16
- 60a:	c9 f7       	brne	.-14     	; 0x5fe <check>
-
-0000060c <match>:
- 60c:	31 e0       	ldi	r19, 0x01	; 1
- 60e:	08 95       	ret
-
-00000610 <notMatch>:
- 610:	30 e0       	ldi	r19, 0x00	; 0
- 612:	43 95       	inc	r20
- 614:	08 95       	ret
-
-00000616 <invalidCommand>:
- 616:	57 df       	rcall	.-338    	; 0x4c6 <resetXBuffer>
- 618:	1f ef       	ldi	r17, 0xFF	; 255
- 61a:	01 2e       	mov	r0, r17
- 61c:	08 95       	ret
-
-0000061e <setZHelp>:
- 61e:	f6 e0       	ldi	r31, 0x06	; 6
- 620:	e0 e6       	ldi	r30, 0x60	; 96
- 622:	08 95       	ret
-
-00000624 <setZInfo>:
- 624:	f6 e0       	ldi	r31, 0x06	; 6
- 626:	e4 e6       	ldi	r30, 0x64	; 100
- 628:	08 95       	ret
-
-0000062a <setZRegs>:
- 62a:	f6 e0       	ldi	r31, 0x06	; 6
- 62c:	e8 e6       	ldi	r30, 0x68	; 104
- 62e:	08 95       	ret
-
-00000630 <setZClear>:
- 630:	f6 e0       	ldi	r31, 0x06	; 6
- 632:	ec e6       	ldi	r30, 0x6C	; 108
- 634:	08 95       	ret
-
-00000636 <setZEcho0>:
- 636:	f6 e0       	ldi	r31, 0x06	; 6
- 638:	e1 e7       	ldi	r30, 0x71	; 113
- 63a:	08 95       	ret
-
-0000063c <setZEcho>:
- 63c:	f6 e0       	ldi	r31, 0x06	; 6
- 63e:	e6 e7       	ldi	r30, 0x76	; 118
- 640:	08 95       	ret
-
-00000642 <setZIndirectJump>:
- 642:	f6 e0       	ldi	r31, 0x06	; 6
- 644:	e8 e8       	ldi	r30, 0x88	; 136
- 646:	08 95       	ret
-
-00000648 <setZMwrite>:
- 648:	f6 e0       	ldi	r31, 0x06	; 6
- 64a:	e0 e8       	ldi	r30, 0x80	; 128
- 64c:	08 95       	ret
-
-0000064e <setZMread>:
- 64e:	f6 e0       	ldi	r31, 0x06	; 6
- 650:	ea e7       	ldi	r30, 0x7A	; 122
- 652:	08 95       	ret
-
-00000654 <setZSpace>:
- 654:	f6 e0       	ldi	r31, 0x06	; 6
- 656:	e7 e8       	ldi	r30, 0x87	; 135
- 658:	08 95       	ret
-
-0000065a <restoreBL>:
- 65a:	38 df       	rcall	.-400    	; 0x4cc <setYBL>
- 65c:	08 81       	ld	r16, Y
- 65e:	08 95       	ret
-
-00000660 <help>:
- 660:	68 65       	ori	r22, 0x58	; 88
- 662:	6c 70       	andi	r22, 0x0C	; 12
-
-00000664 <info>:
- 664:	69 6e       	ori	r22, 0xE9	; 233
- 666:	66 6f       	ori	r22, 0xF6	; 246
-
-00000668 <regs>:
- 668:	72 65       	ori	r23, 0x52	; 82
- 66a:	67 73       	andi	r22, 0x37	; 55
-
-0000066c <clear>:
- 66c:	63 6c       	ori	r22, 0xC3	; 195
- 66e:	65 61       	ori	r22, 0x15	; 21
- 670:	Address 0x670 is out of bounds.
-
-
-00000671 <echo0>:
- 671:	65 63       	ori	r22, 0x35	; 53
- 673:	68 6f       	ori	r22, 0xF8	; 248
- 675:	Address 0x675 is out of bounds.
-
-
-00000676 <echo>:
- 676:	65 63       	ori	r22, 0x35	; 53
- 678:	68 6f       	ori	r22, 0xF8	; 248
-
-0000067a <mread>:
- 67a:	6d 72       	andi	r22, 0x2D	; 45
- 67c:	65 61       	ori	r22, 0x15	; 21
- 67e:	64 20       	and	r6, r4
-
-00000680 <mwrite>:
- 680:	6d 77       	andi	r22, 0x7D	; 125
- 682:	72 69       	ori	r23, 0x92	; 146
- 684:	74 65       	ori	r23, 0x54	; 84
- 686:	Address 0x686 is out of bounds.
-
-
-00000687 <space>:
- 687:	Address 0x687 is out of bounds.
-
-
-00000688 <indirectJump>:
- 688:	69 6a       	ori	r22, 0xA9	; 169
- 68a:	6d 70       	andi	r22, 0x0D	; 13
- 68c:	20 00       	.word	0x0020	; ????
-
-0000068e <regsCommand>:
- 68e:	00 27       	eor	r16, r16
- 690:	81 d0       	rcall	.+258    	; 0x794 <setZRegs>
- 692:	ef 01       	movw	r28, r30
-
-00000694 <loop1>:
- 694:	fe 01       	movw	r30, r28
- 696:	95 91       	lpm	r25, Z+
- 698:	ef 01       	movw	r28, r30
- 69a:	99 23       	and	r25, r25
- 69c:	31 f0       	breq	.+12     	; 0x6aa <done1>
- 69e:	9d 30       	cpi	r25, 0x0D	; 13
- 6a0:	29 f0       	breq	.+10     	; 0x6ac <newLine>
- 6a2:	9a 30       	cpi	r25, 0x0A	; 10
- 6a4:	29 f0       	breq	.+10     	; 0x6b0 <printRegs>
- 6a6:	2a dd       	rcall	.-1452   	; 0xfc <uartSend>
- 6a8:	f5 cf       	rjmp	.-22     	; 0x694 <loop1>
-
-000006aa <done1>:
- 6aa:	08 95       	ret
-
-000006ac <newLine>:
- 6ac:	a6 dd       	rcall	.-1204   	; 0x1fa <terminalNewLine>
- 6ae:	f2 cf       	rjmp	.-28     	; 0x694 <loop1>
-
-000006b0 <printRegs>:
- 6b0:	ef 01       	movw	r28, r30
- 6b2:	03 d0       	rcall	.+6      	; 0x6ba <setZIjmpList>
- 6b4:	e0 0f       	add	r30, r16
- 6b6:	f1 1d       	adc	r31, r1
- 6b8:	09 94       	ijmp
-
-000006ba <setZIjmpList>:
- 6ba:	f3 e0       	ldi	r31, 0x03	; 3
- 6bc:	e0 e6       	ldi	r30, 0x60	; 96
- 6be:	08 95       	ret
-
-000006c0 <ijmpList>:
- 6c0:	23 c0       	rjmp	.+70     	; 0x708 <r0>
- 6c2:	24 c0       	rjmp	.+72     	; 0x70c <r1>
- 6c4:	25 c0       	rjmp	.+74     	; 0x710 <r2>
- 6c6:	26 c0       	rjmp	.+76     	; 0x714 <r3>
- 6c8:	27 c0       	rjmp	.+78     	; 0x718 <r4>
- 6ca:	28 c0       	rjmp	.+80     	; 0x71c <r5>
- 6cc:	29 c0       	rjmp	.+82     	; 0x720 <r6>
- 6ce:	2a c0       	rjmp	.+84     	; 0x724 <r7>
- 6d0:	2b c0       	rjmp	.+86     	; 0x728 <r8>
- 6d2:	2c c0       	rjmp	.+88     	; 0x72c <r9>
- 6d4:	2d c0       	rjmp	.+90     	; 0x730 <r10>
- 6d6:	2e c0       	rjmp	.+92     	; 0x734 <r11>
- 6d8:	2f c0       	rjmp	.+94     	; 0x738 <r12>
- 6da:	30 c0       	rjmp	.+96     	; 0x73c <r13>
- 6dc:	31 c0       	rjmp	.+98     	; 0x740 <r14>
- 6de:	32 c0       	rjmp	.+100    	; 0x744 <r15>
- 6e0:	33 c0       	rjmp	.+102    	; 0x748 <r16>
- 6e2:	34 c0       	rjmp	.+104    	; 0x74c <r17>
- 6e4:	35 c0       	rjmp	.+106    	; 0x750 <r18>
- 6e6:	36 c0       	rjmp	.+108    	; 0x754 <r19>
- 6e8:	37 c0       	rjmp	.+110    	; 0x758 <r20>
- 6ea:	38 c0       	rjmp	.+112    	; 0x75c <r21>
- 6ec:	38 c0       	rjmp	.+112    	; 0x75e <r22>
- 6ee:	39 c0       	rjmp	.+114    	; 0x762 <r23>
- 6f0:	3a c0       	rjmp	.+116    	; 0x766 <r24>
- 6f2:	3b c0       	rjmp	.+118    	; 0x76a <r25>
- 6f4:	3c c0       	rjmp	.+120    	; 0x76e <r26>
- 6f6:	3d c0       	rjmp	.+122    	; 0x772 <r27>
- 6f8:	3e c0       	rjmp	.+124    	; 0x776 <r28>
- 6fa:	3f c0       	rjmp	.+126    	; 0x77a <r29>
- 6fc:	40 c0       	rjmp	.+128    	; 0x77e <r30>
- 6fe:	41 c0       	rjmp	.+130    	; 0x782 <r31>
- 700:	42 c0       	rjmp	.+132    	; 0x786 <SP>
-
-00000702 <shortcut>:
- 702:	15 dd       	rcall	.-1494   	; 0x12e <uartSendHex>
- 704:	03 95       	inc	r16
- 706:	c6 cf       	rjmp	.-116    	; 0x694 <loop1>
-
-00000708 <r0>:
- 708:	50 2d       	mov	r21, r0
- 70a:	fb cf       	rjmp	.-10     	; 0x702 <shortcut>
-
-0000070c <r1>:
- 70c:	51 2d       	mov	r21, r1
- 70e:	f9 cf       	rjmp	.-14     	; 0x702 <shortcut>
-
-00000710 <r2>:
- 710:	52 2d       	mov	r21, r2
- 712:	f7 cf       	rjmp	.-18     	; 0x702 <shortcut>
-
-00000714 <r3>:
- 714:	53 2d       	mov	r21, r3
- 716:	f5 cf       	rjmp	.-22     	; 0x702 <shortcut>
-
-00000718 <r4>:
- 718:	54 2d       	mov	r21, r4
- 71a:	f3 cf       	rjmp	.-26     	; 0x702 <shortcut>
-
-0000071c <r5>:
- 71c:	55 2d       	mov	r21, r5
- 71e:	f1 cf       	rjmp	.-30     	; 0x702 <shortcut>
-
-00000720 <r6>:
- 720:	56 2d       	mov	r21, r6
- 722:	ef cf       	rjmp	.-34     	; 0x702 <shortcut>
-
-00000724 <r7>:
- 724:	57 2d       	mov	r21, r7
- 726:	ed cf       	rjmp	.-38     	; 0x702 <shortcut>
-
-00000728 <r8>:
- 728:	58 2d       	mov	r21, r8
- 72a:	eb cf       	rjmp	.-42     	; 0x702 <shortcut>
-
-0000072c <r9>:
- 72c:	59 2d       	mov	r21, r9
- 72e:	e9 cf       	rjmp	.-46     	; 0x702 <shortcut>
-
-00000730 <r10>:
- 730:	5a 2d       	mov	r21, r10
- 732:	e7 cf       	rjmp	.-50     	; 0x702 <shortcut>
-
-00000734 <r11>:
- 734:	5b 2d       	mov	r21, r11
- 736:	e5 cf       	rjmp	.-54     	; 0x702 <shortcut>
-
-00000738 <r12>:
- 738:	5c 2d       	mov	r21, r12
- 73a:	e3 cf       	rjmp	.-58     	; 0x702 <shortcut>
-
-0000073c <r13>:
- 73c:	5d 2d       	mov	r21, r13
- 73e:	e1 cf       	rjmp	.-62     	; 0x702 <shortcut>
-
-00000740 <r14>:
- 740:	5e 2d       	mov	r21, r14
- 742:	df cf       	rjmp	.-66     	; 0x702 <shortcut>
-
-00000744 <r15>:
- 744:	5f 2d       	mov	r21, r15
- 746:	dd cf       	rjmp	.-70     	; 0x702 <shortcut>
-
-00000748 <r16>:
- 748:	50 2f       	mov	r21, r16
- 74a:	db cf       	rjmp	.-74     	; 0x702 <shortcut>
-
-0000074c <r17>:
- 74c:	51 2f       	mov	r21, r17
- 74e:	d9 cf       	rjmp	.-78     	; 0x702 <shortcut>
-
-00000750 <r18>:
- 750:	52 2f       	mov	r21, r18
- 752:	d7 cf       	rjmp	.-82     	; 0x702 <shortcut>
-
-00000754 <r19>:
- 754:	53 2f       	mov	r21, r19
- 756:	d5 cf       	rjmp	.-86     	; 0x702 <shortcut>
-
-00000758 <r20>:
- 758:	54 2f       	mov	r21, r20
- 75a:	d3 cf       	rjmp	.-90     	; 0x702 <shortcut>
-
-0000075c <r21>:
- 75c:	d2 cf       	rjmp	.-92     	; 0x702 <shortcut>
-
-0000075e <r22>:
- 75e:	56 2f       	mov	r21, r22
- 760:	d0 cf       	rjmp	.-96     	; 0x702 <shortcut>
-
-00000762 <r23>:
- 762:	57 2f       	mov	r21, r23
- 764:	ce cf       	rjmp	.-100    	; 0x702 <shortcut>
-
-00000766 <r24>:
- 766:	58 2f       	mov	r21, r24
- 768:	cc cf       	rjmp	.-104    	; 0x702 <shortcut>
-
-0000076a <r25>:
- 76a:	59 2f       	mov	r21, r25
- 76c:	ca cf       	rjmp	.-108    	; 0x702 <shortcut>
-
-0000076e <r26>:
- 76e:	5a 2f       	mov	r21, r26
- 770:	c8 cf       	rjmp	.-112    	; 0x702 <shortcut>
-
-00000772 <r27>:
- 772:	5b 2f       	mov	r21, r27
- 774:	c6 cf       	rjmp	.-116    	; 0x702 <shortcut>
-
-00000776 <r28>:
- 776:	5c 2f       	mov	r21, r28
- 778:	c4 cf       	rjmp	.-120    	; 0x702 <shortcut>
-
-0000077a <r29>:
- 77a:	5d 2f       	mov	r21, r29
- 77c:	c2 cf       	rjmp	.-124    	; 0x702 <shortcut>
-
-0000077e <r30>:
- 77e:	5e 2f       	mov	r21, r30
- 780:	c0 cf       	rjmp	.-128    	; 0x702 <shortcut>
-
-00000782 <r31>:
- 782:	5f 2f       	mov	r21, r31
- 784:	be cf       	rjmp	.-132    	; 0x702 <shortcut>
-
-00000786 <SP>:
- 786:	50 91 5e 00 	lds	r21, 0x005E	; 0x80005e <__TEXT_REGION_LENGTH__+0x7e005e>
- 78a:	d1 dc       	rcall	.-1630   	; 0x12e <uartSendHex>
- 78c:	50 91 5d 00 	lds	r21, 0x005D	; 0x80005d <__TEXT_REGION_LENGTH__+0x7e005d>
- 790:	ce dc       	rcall	.-1636   	; 0x12e <uartSendHex>
- 792:	8b cf       	rjmp	.-234    	; 0x6aa <done1>
-
-00000794 <setZRegs>:
- 794:	f7 e0       	ldi	r31, 0x07	; 7
- 796:	ea e9       	ldi	r30, 0x9A	; 154
- 798:	08 95       	ret
-
-0000079a <regsMessage>:
- 79a:	72 30       	cpi	r23, 0x02	; 2
- 79c:	3a 30       	cpi	r19, 0x0A	; 10
- 79e:	78 0a       	sbc	r7, r24
- 7a0:	20 72       	andi	r18, 0x20	; 32
- 7a2:	31 3a       	cpi	r19, 0xA1	; 161
- 7a4:	30 78       	andi	r19, 0x80	; 128
- 7a6:	0a 20       	and	r0, r10
- 7a8:	72 32       	cpi	r23, 0x22	; 34
- 7aa:	3a 30       	cpi	r19, 0x0A	; 10
- 7ac:	78 0a       	sbc	r7, r24
- 7ae:	20 72       	andi	r18, 0x20	; 32
- 7b0:	33 3a       	cpi	r19, 0xA3	; 163
- 7b2:	30 78       	andi	r19, 0x80	; 128
- 7b4:	0a 20       	and	r0, r10
- 7b6:	72 34       	cpi	r23, 0x42	; 66
- 7b8:	3a 30       	cpi	r19, 0x0A	; 10
- 7ba:	78 0a       	sbc	r7, r24
- 7bc:	20 72       	andi	r18, 0x20	; 32
- 7be:	35 3a       	cpi	r19, 0xA5	; 165
- 7c0:	30 78       	andi	r19, 0x80	; 128
- 7c2:	0a 0d       	add	r16, r10
- 7c4:	72 36       	cpi	r23, 0x62	; 98
- 7c6:	3a 30       	cpi	r19, 0x0A	; 10
- 7c8:	78 0a       	sbc	r7, r24
- 7ca:	20 72       	andi	r18, 0x20	; 32
- 7cc:	37 3a       	cpi	r19, 0xA7	; 167
- 7ce:	30 78       	andi	r19, 0x80	; 128
- 7d0:	0a 20       	and	r0, r10
- 7d2:	72 38       	cpi	r23, 0x82	; 130
- 7d4:	3a 30       	cpi	r19, 0x0A	; 10
- 7d6:	78 0a       	sbc	r7, r24
- 7d8:	20 72       	andi	r18, 0x20	; 32
- 7da:	39 3a       	cpi	r19, 0xA9	; 169
- 7dc:	30 78       	andi	r19, 0x80	; 128
- 7de:	0a 20       	and	r0, r10
- 7e0:	72 31       	cpi	r23, 0x12	; 18
- 7e2:	30 3a       	cpi	r19, 0xA0	; 160
- 7e4:	30 78       	andi	r19, 0x80	; 128
- 7e6:	0a 20       	and	r0, r10
- 7e8:	72 31       	cpi	r23, 0x12	; 18
- 7ea:	31 3a       	cpi	r19, 0xA1	; 161
- 7ec:	30 78       	andi	r19, 0x80	; 128
- 7ee:	0a 0d       	add	r16, r10
- 7f0:	72 31       	cpi	r23, 0x12	; 18
- 7f2:	32 3a       	cpi	r19, 0xA2	; 162
- 7f4:	30 78       	andi	r19, 0x80	; 128
- 7f6:	0a 20       	and	r0, r10
- 7f8:	72 31       	cpi	r23, 0x12	; 18
- 7fa:	33 3a       	cpi	r19, 0xA3	; 163
- 7fc:	30 78       	andi	r19, 0x80	; 128
- 7fe:	0a 20       	and	r0, r10
- 800:	72 31       	cpi	r23, 0x12	; 18
- 802:	34 3a       	cpi	r19, 0xA4	; 164
- 804:	30 78       	andi	r19, 0x80	; 128
- 806:	0a 20       	and	r0, r10
- 808:	72 31       	cpi	r23, 0x12	; 18
- 80a:	35 3a       	cpi	r19, 0xA5	; 165
- 80c:	30 78       	andi	r19, 0x80	; 128
- 80e:	0a 20       	and	r0, r10
- 810:	72 31       	cpi	r23, 0x12	; 18
- 812:	36 3a       	cpi	r19, 0xA6	; 166
- 814:	30 78       	andi	r19, 0x80	; 128
- 816:	0a 20       	and	r0, r10
- 818:	72 31       	cpi	r23, 0x12	; 18
- 81a:	37 3a       	cpi	r19, 0xA7	; 167
- 81c:	30 78       	andi	r19, 0x80	; 128
- 81e:	0a 0d       	add	r16, r10
- 820:	72 31       	cpi	r23, 0x12	; 18
- 822:	38 3a       	cpi	r19, 0xA8	; 168
- 824:	30 78       	andi	r19, 0x80	; 128
- 826:	0a 20       	and	r0, r10
- 828:	72 31       	cpi	r23, 0x12	; 18
- 82a:	39 3a       	cpi	r19, 0xA9	; 169
- 82c:	30 78       	andi	r19, 0x80	; 128
- 82e:	0a 20       	and	r0, r10
- 830:	72 32       	cpi	r23, 0x22	; 34
- 832:	30 3a       	cpi	r19, 0xA0	; 160
- 834:	30 78       	andi	r19, 0x80	; 128
- 836:	0a 20       	and	r0, r10
- 838:	72 32       	cpi	r23, 0x22	; 34
- 83a:	31 3a       	cpi	r19, 0xA1	; 161
- 83c:	30 78       	andi	r19, 0x80	; 128
- 83e:	0a 20       	and	r0, r10
- 840:	72 32       	cpi	r23, 0x22	; 34
- 842:	32 3a       	cpi	r19, 0xA2	; 162
- 844:	30 78       	andi	r19, 0x80	; 128
- 846:	0a 20       	and	r0, r10
- 848:	72 32       	cpi	r23, 0x22	; 34
- 84a:	33 3a       	cpi	r19, 0xA3	; 163
- 84c:	30 78       	andi	r19, 0x80	; 128
- 84e:	0a 0d       	add	r16, r10
- 850:	72 32       	cpi	r23, 0x22	; 34
- 852:	34 3a       	cpi	r19, 0xA4	; 164
- 854:	30 78       	andi	r19, 0x80	; 128
- 856:	0a 20       	and	r0, r10
- 858:	72 32       	cpi	r23, 0x22	; 34
- 85a:	35 3a       	cpi	r19, 0xA5	; 165
- 85c:	30 78       	andi	r19, 0x80	; 128
- 85e:	0a 20       	and	r0, r10
- 860:	72 32       	cpi	r23, 0x22	; 34
- 862:	36 3a       	cpi	r19, 0xA6	; 166
- 864:	30 78       	andi	r19, 0x80	; 128
- 866:	0a 20       	and	r0, r10
- 868:	72 32       	cpi	r23, 0x22	; 34
- 86a:	37 3a       	cpi	r19, 0xA7	; 167
- 86c:	30 78       	andi	r19, 0x80	; 128
- 86e:	0a 20       	and	r0, r10
- 870:	72 32       	cpi	r23, 0x22	; 34
- 872:	38 3a       	cpi	r19, 0xA8	; 168
- 874:	30 78       	andi	r19, 0x80	; 128
- 876:	0a 20       	and	r0, r10
- 878:	72 32       	cpi	r23, 0x22	; 34
- 87a:	39 3a       	cpi	r19, 0xA9	; 169
- 87c:	30 78       	andi	r19, 0x80	; 128
- 87e:	0a 0d       	add	r16, r10
- 880:	72 33       	cpi	r23, 0x32	; 50
- 882:	30 3a       	cpi	r19, 0xA0	; 160
- 884:	30 78       	andi	r19, 0x80	; 128
- 886:	0a 20       	and	r0, r10
- 888:	72 33       	cpi	r23, 0x32	; 50
- 88a:	31 3a       	cpi	r19, 0xA1	; 161
- 88c:	30 78       	andi	r19, 0x80	; 128
- 88e:	0a 20       	and	r0, r10
- 890:	53 50       	subi	r21, 0x03	; 3
- 892:	3a 30       	cpi	r19, 0x0A	; 10
- 894:	78 0a       	sbc	r7, r24
+ 460:	40 40       	sbci	r20, 0x00	; 0
+ 462:	40 40       	sbci	r20, 0x00	; 0
+ 464:	40 2e       	mov	r4, r16
+ 466:	20 2f       	mov	r18, r16
+ 468:	40 40       	sbci	r20, 0x00	; 0
+ 46a:	40 40       	sbci	r20, 0x00	; 0
+ 46c:	2e 60       	ori	r18, 0x0E	; 14
+ 46e:	60 60       	ori	r22, 0x00	; 0
+ 470:	60 60       	ori	r22, 0x00	; 0
+ 472:	60 09       	sbc	r22, r0
+ 474:	41 56       	subi	r20, 0x61	; 97
+ 476:	52 3a       	cpi	r21, 0xA2	; 162
+ 478:	20 31       	cpi	r18, 0x10	; 16
+ 47a:	30 30       	cpi	r19, 0x00	; 0
+ 47c:	25 0d       	add	r18, r5
+ 47e:	20 2f       	mov	r18, r16
+ 480:	40 2f       	mov	r20, r16
+ 482:	60 60       	ori	r22, 0x00	; 0
+ 484:	60 60       	ori	r22, 0x00	; 0
+ 486:	60 40       	sbci	r22, 0x00	; 0
+ 488:	40 56       	subi	r20, 0x60	; 96
+ 48a:	40 2f       	mov	r20, r16
+ 48c:	60 40       	sbci	r22, 0x00	; 0
+ 48e:	40 40       	sbci	r20, 0x00	; 0
+ 490:	40 2e       	mov	r4, r16
+ 492:	09 09       	sbc	r16, r9
+ 494:	56 45       	sbci	r21, 0x56	; 86
+ 496:	52 53       	subi	r21, 0x32	; 50
+ 498:	49 4f       	sbci	r20, 0xF9	; 249
+ 49a:	4e 3a       	cpi	r20, 0xAE	; 174
+ 49c:	20 30       	cpi	r18, 0x00	; 0
+ 49e:	2e 31       	cpi	r18, 0x1E	; 30
+ 4a0:	2e 30       	cpi	r18, 0x0E	; 14
+ 4a2:	2d 61       	ori	r18, 0x1D	; 29
+ 4a4:	6c 70       	andi	r22, 0x0C	; 12
+ 4a6:	68 61       	ori	r22, 0x18	; 24
+ 4a8:	0d 2f       	mov	r16, r29
+ 4aa:	40 2f       	mov	r20, r16
+ 4ac:	20 20       	and	r2, r0
+ 4ae:	20 20       	and	r2, r0
+ 4b0:	20 20       	and	r2, r0
+ 4b2:	60 40       	sbci	r22, 0x00	; 0
+ 4b4:	40 2f       	mov	r20, r16
+ 4b6:	20 20       	and	r2, r0
+ 4b8:	20 20       	and	r2, r0
+ 4ba:	60 40       	sbci	r22, 0x00	; 0
+ 4bc:	40 40       	sbci	r20, 0x00	; 0
+ 4be:	40 2e       	mov	r4, r16
 	...
 
-00000898 <echoCommand>:
- 898:	19 de       	rcall	.-974    	; 0x4cc <setYBL>
- 89a:	08 81       	ld	r16, Y
- 89c:	14 de       	rcall	.-984    	; 0x4c6 <resetXBuffer>
- 89e:	15 96       	adiw	r26, 0x05	; 5
- 8a0:	05 50       	subi	r16, 0x05	; 5
+000004c2 <bufferAdd>:
+ 4c2:	07 d0       	rcall	.+14     	; 0x4d2 <incBL>
+ 4c4:	01 32       	cpi	r16, 0x21	; 33
+ 4c6:	e9 f0       	breq	.+58     	; 0x502 <overflow>
+ 4c8:	9d 93       	st	X+, r25
+ 4ca:	08 95       	ret
 
-000008a2 <loop1>:
- 8a2:	00 23       	and	r16, r16
- 8a4:	21 f0       	breq	.+8      	; 0x8ae <done1>
- 8a6:	9d 91       	ld	r25, X+
- 8a8:	29 dc       	rcall	.-1966   	; 0xfc <uartSend>
- 8aa:	0a 95       	dec	r16
- 8ac:	fa cf       	rjmp	.-12     	; 0x8a2 <loop1>
+000004cc <bufferDel>:
+ 4cc:	07 d0       	rcall	.+14     	; 0x4dc <decBL>
+ 4ce:	11 97       	sbiw	r26, 0x01	; 1
+ 4d0:	08 95       	ret
 
-000008ae <done1>:
- 8ae:	08 95       	ret
+000004d2 <incBL>:
+ 4d2:	11 d0       	rcall	.+34     	; 0x4f6 <setYBL>
+ 4d4:	08 81       	ld	r16, Y
+ 4d6:	03 95       	inc	r16
+ 4d8:	08 83       	st	Y, r16
+ 4da:	08 95       	ret
 
-000008b0 <echoNoARG>:
- 8b0:	06 d0       	rcall	.+12     	; 0x8be <setZNoARG>
+000004dc <decBL>:
+ 4dc:	0c d0       	rcall	.+24     	; 0x4f6 <setYBL>
+ 4de:	08 81       	ld	r16, Y
+ 4e0:	0a 95       	dec	r16
+ 4e2:	08 83       	st	Y, r16
+ 4e4:	08 95       	ret
 
-000008b2 <loop2>:
- 8b2:	95 91       	lpm	r25, Z+
- 8b4:	90 30       	cpi	r25, 0x00	; 0
- 8b6:	11 f0       	breq	.+4      	; 0x8bc <done2>
- 8b8:	21 dc       	rcall	.-1982   	; 0xfc <uartSend>
- 8ba:	fb cf       	rjmp	.-10     	; 0x8b2 <loop2>
+000004e6 <bufferReset>:
+ 4e6:	04 d0       	rcall	.+8      	; 0x4f0 <resetXBuffer>
+ 4e8:	06 d0       	rcall	.+12     	; 0x4f6 <setYBL>
+ 4ea:	00 e0       	ldi	r16, 0x00	; 0
+ 4ec:	08 83       	st	Y, r16
+ 4ee:	08 95       	ret
 
-000008bc <done2>:
- 8bc:	08 95       	ret
+000004f0 <resetXBuffer>:
+ 4f0:	b1 e0       	ldi	r27, 0x01	; 1
+ 4f2:	a0 e0       	ldi	r26, 0x00	; 0
+ 4f4:	08 95       	ret
 
-000008be <setZNoARG>:
- 8be:	f8 e0       	ldi	r31, 0x08	; 8
- 8c0:	e4 ec       	ldi	r30, 0xC4	; 196
- 8c2:	08 95       	ret
+000004f6 <setYBL>:
+ 4f6:	d1 e0       	ldi	r29, 0x01	; 1
+ 4f8:	c0 e2       	ldi	r28, 0x20	; 32
+ 4fa:	08 95       	ret
 
-000008c4 <noARG>:
- 8c4:	45 52       	subi	r20, 0x25	; 37
- 8c6:	52 4f       	sbci	r21, 0xF2	; 242
- 8c8:	52 3a       	cpi	r21, 0xA2	; 162
- 8ca:	20 4e       	sbci	r18, 0xE0	; 224
- 8cc:	6f 20       	and	r6, r15
- 8ce:	61 72       	andi	r22, 0x21	; 33
- 8d0:	67 75       	andi	r22, 0x57	; 87
- 8d2:	6d 65       	ori	r22, 0x5D	; 93
- 8d4:	6e 74       	andi	r22, 0x4E	; 78
- 8d6:	20 70       	andi	r18, 0x00	; 0
- 8d8:	72 6f       	ori	r23, 0xF2	; 242
- 8da:	76 69       	ori	r23, 0x96	; 150
- 8dc:	64 65       	ori	r22, 0x54	; 84
- 8de:	64 00       	.word	0x0064	; ????
+000004fc <setZErrorOverflow>:
+ 4fc:	f5 e0       	ldi	r31, 0x05	; 5
+ 4fe:	e8 e1       	ldi	r30, 0x18	; 24
+ 500:	08 95       	ret
 
-000008e0 <ahtoi>:
- 8e0:	33 27       	eor	r19, r19
- 8e2:	cc 27       	eor	r28, r28
- 8e4:	dd 27       	eor	r29, r29
- 8e6:	ee 27       	eor	r30, r30
- 8e8:	ff 27       	eor	r31, r31
- 8ea:	12 30       	cpi	r17, 0x02	; 2
- 8ec:	09 f0       	breq	.+2      	; 0x8f0 <ahtoiword>
- 8ee:	25 c0       	rjmp	.+74     	; 0x93a <ahtoibyte>
+00000502 <overflow>:
+ 502:	f1 df       	rcall	.-30     	; 0x4e6 <bufferReset>
+ 504:	fb df       	rcall	.-10     	; 0x4fc <setZErrorOverflow>
+ 506:	95 de       	rcall	.-726    	; 0x232 <terminalNewLine>
 
-000008f0 <ahtoiword>:
- 8f0:	2d 91       	ld	r18, X+
- 8f2:	2f d0       	rcall	.+94     	; 0x952 <isValidChar>
- 8f4:	31 30       	cpi	r19, 0x01	; 1
- 8f6:	f1 f0       	breq	.+60     	; 0x934 <abort>
- 8f8:	c2 2f       	mov	r28, r18
- 8fa:	48 d0       	rcall	.+144    	; 0x98c <Yx16>
- 8fc:	47 d0       	rcall	.+142    	; 0x98c <Yx16>
- 8fe:	46 d0       	rcall	.+140    	; 0x98c <Yx16>
+00000508 <loop1>:
+ 508:	95 91       	lpm	r25, Z+
+ 50a:	99 23       	and	r25, r25
+ 50c:	11 f0       	breq	.+4      	; 0x512 <done1>
+ 50e:	12 de       	rcall	.-988    	; 0x134 <uartSend>
+ 510:	fb cf       	rjmp	.-10     	; 0x508 <loop1>
 
-00000900 <char2>:
- 900:	2d 91       	ld	r18, X+
- 902:	27 d0       	rcall	.+78     	; 0x952 <isValidChar>
- 904:	31 30       	cpi	r19, 0x01	; 1
- 906:	b1 f0       	breq	.+44     	; 0x934 <abort>
- 908:	e2 2f       	mov	r30, r18
- 90a:	49 d0       	rcall	.+146    	; 0x99e <Zx16>
- 90c:	48 d0       	rcall	.+144    	; 0x99e <Zx16>
- 90e:	ce 0f       	add	r28, r30
- 910:	df 1f       	adc	r29, r31
+00000512 <done1>:
+ 512:	8c de       	rcall	.-744    	; 0x22c <terminalEnter>
+ 514:	99 27       	eor	r25, r25
+ 516:	08 95       	ret
 
-00000912 <char3>:
- 912:	2d 91       	ld	r18, X+
- 914:	1e d0       	rcall	.+60     	; 0x952 <isValidChar>
- 916:	31 30       	cpi	r19, 0x01	; 1
- 918:	69 f0       	breq	.+26     	; 0x934 <abort>
- 91a:	ee 27       	eor	r30, r30
- 91c:	ff 27       	eor	r31, r31
- 91e:	e2 2f       	mov	r30, r18
- 920:	3e d0       	rcall	.+124    	; 0x99e <Zx16>
- 922:	ce 0f       	add	r28, r30
- 924:	df 1f       	adc	r29, r31
+00000518 <errorOverflow>:
+ 518:	45 52       	subi	r20, 0x25	; 37
+ 51a:	52 4f       	sbci	r21, 0xF2	; 242
+ 51c:	52 3a       	cpi	r21, 0xA2	; 162
+ 51e:	20 4f       	sbci	r18, 0xF0	; 240
+ 520:	56 45       	sbci	r21, 0x56	; 86
+ 522:	52 46       	sbci	r21, 0x62	; 98
+ 524:	4c 4f       	sbci	r20, 0xFC	; 252
+ 526:	57 20       	and	r5, r7
+ 528:	33 32       	cpi	r19, 0x23	; 35
+ 52a:	20 63       	ori	r18, 0x30	; 48
+ 52c:	68 61       	ori	r22, 0x18	; 24
+ 52e:	72 61       	ori	r23, 0x12	; 18
+ 530:	63 74       	andi	r22, 0x43	; 67
+ 532:	65 72       	andi	r22, 0x25	; 37
+ 534:	20 6c       	ori	r18, 0xC0	; 192
+ 536:	69 6d       	ori	r22, 0xD9	; 217
+ 538:	69 74       	andi	r22, 0x49	; 73
+ 53a:	21 00       	.word	0x0021	; ????
 
-00000926 <char4>:
- 926:	2d 91       	ld	r18, X+
- 928:	14 d0       	rcall	.+40     	; 0x952 <isValidChar>
- 92a:	31 30       	cpi	r19, 0x01	; 1
- 92c:	19 f0       	breq	.+6      	; 0x934 <abort>
- 92e:	c2 0f       	add	r28, r18
- 930:	d1 1d       	adc	r29, r1
- 932:	08 95       	ret
+0000053c <parseCommand>:
+ 53c:	f9 d0       	rcall	.+498    	; 0x730 <restoreBL>
+ 53e:	07 c0       	rjmp	.+14     	; 0x54e <variableLength>
 
-00000934 <abort>:
- 934:	2d ef       	ldi	r18, 0xFD	; 253
- 936:	02 2e       	mov	r0, r18
- 938:	08 95       	ret
+00000540 <notVariableLength>:
+ 540:	04 30       	cpi	r16, 0x04	; 4
+ 542:	09 f4       	brne	.+2      	; 0x546 <notChar4>
+ 544:	b8 c0       	rjmp	.+368    	; 0x6b6 <char4>
 
-0000093a <ahtoibyte>:
- 93a:	2d 91       	ld	r18, X+
- 93c:	0a d0       	rcall	.+20     	; 0x952 <isValidChar>
- 93e:	31 30       	cpi	r19, 0x01	; 1
- 940:	c9 f3       	breq	.-14     	; 0x934 <abort>
- 942:	1f d0       	rcall	.+62     	; 0x982 <bytex16>
- 944:	22 2e       	mov	r2, r18
+00000546 <notChar4>:
+ 546:	05 30       	cpi	r16, 0x05	; 5
+ 548:	09 f4       	brne	.+2      	; 0x54c <notChar5>
+ 54a:	af c0       	rjmp	.+350    	; 0x6aa <char5>
 
-00000946 <char2b>:
- 946:	2d 91       	ld	r18, X+
- 948:	04 d0       	rcall	.+8      	; 0x952 <isValidChar>
- 94a:	31 30       	cpi	r19, 0x01	; 1
- 94c:	99 f3       	breq	.-26     	; 0x934 <abort>
- 94e:	22 0e       	add	r2, r18
- 950:	08 95       	ret
+0000054c <notChar5>:
+ 54c:	d2 c0       	rjmp	.+420    	; 0x6f2 <invalidCommand>
 
-00000952 <isValidChar>:
- 952:	21 36       	cpi	r18, 0x61	; 97
- 954:	40 f4       	brcc	.+16     	; 0x966 <lowerLetterRangeLowercase>
- 956:	20 33       	cpi	r18, 0x30	; 48
- 958:	18 f4       	brcc	.+6      	; 0x960 <lowerDigitRange>
- 95a:	21 34       	cpi	r18, 0x41	; 65
- 95c:	38 f4       	brcc	.+14     	; 0x96c <lowerLetterRangeUppercase>
- 95e:	0f c0       	rjmp	.+30     	; 0x97e <invalidChar>
+0000054e <variableLength>:
+ 54e:	40 ef       	ldi	r20, 0xF0	; 240
+ 550:	e0 d0       	rcall	.+448    	; 0x712 <setZEcho>
+ 552:	04 e0       	ldi	r16, 0x04	; 4
+ 554:	c1 d0       	rcall	.+386    	; 0x6d8 <noRestoreBL>
+ 556:	31 30       	cpi	r19, 0x01	; 1
+ 558:	09 f4       	brne	.+2      	; 0x55c <notEcho>
+ 55a:	85 c0       	rjmp	.+266    	; 0x666 <isEcho>
 
-00000960 <lowerDigitRange>:
- 960:	2a 33       	cpi	r18, 0x3A	; 58
- 962:	38 f0       	brcs	.+14     	; 0x972 <validDigit>
- 964:	0c c0       	rjmp	.+24     	; 0x97e <invalidChar>
+0000055c <notEcho>:
+ 55c:	e9 d0       	rcall	.+466    	; 0x730 <restoreBL>
+ 55e:	dc d0       	rcall	.+440    	; 0x718 <setZIndirectJump>
+ 560:	04 e0       	ldi	r16, 0x04	; 4
+ 562:	ba d0       	rcall	.+372    	; 0x6d8 <noRestoreBL>
+ 564:	31 30       	cpi	r19, 0x01	; 1
+ 566:	09 f4       	brne	.+2      	; 0x56a <notIjmp>
+ 568:	5b c0       	rjmp	.+182    	; 0x620 <isIjmp>
 
-00000966 <lowerLetterRangeLowercase>:
- 966:	27 36       	cpi	r18, 0x67	; 103
- 968:	40 f0       	brcs	.+16     	; 0x97a <validLetterLowercase>
- 96a:	09 c0       	rjmp	.+18     	; 0x97e <invalidChar>
+0000056a <notIjmp>:
+ 56a:	e2 d0       	rcall	.+452    	; 0x730 <restoreBL>
+ 56c:	db d0       	rcall	.+438    	; 0x724 <setZMread>
+ 56e:	05 e0       	ldi	r16, 0x05	; 5
+ 570:	b3 d0       	rcall	.+358    	; 0x6d8 <noRestoreBL>
+ 572:	31 30       	cpi	r19, 0x01	; 1
+ 574:	09 f4       	brne	.+2      	; 0x578 <notMread>
+ 576:	34 c0       	rjmp	.+104    	; 0x5e0 <isMread>
 
-0000096c <lowerLetterRangeUppercase>:
- 96c:	27 34       	cpi	r18, 0x47	; 71
- 96e:	18 f0       	brcs	.+6      	; 0x976 <validLetterUppercase>
- 970:	06 c0       	rjmp	.+12     	; 0x97e <invalidChar>
+00000578 <notMread>:
+ 578:	db d0       	rcall	.+438    	; 0x730 <restoreBL>
+ 57a:	d1 d0       	rcall	.+418    	; 0x71e <setZMwrite>
+ 57c:	06 e0       	ldi	r16, 0x06	; 6
+ 57e:	ac d0       	rcall	.+344    	; 0x6d8 <noRestoreBL>
+ 580:	31 30       	cpi	r19, 0x01	; 1
+ 582:	09 f4       	brne	.+2      	; 0x586 <notMwrite>
+ 584:	02 c0       	rjmp	.+4      	; 0x58a <isMwrite>
 
-00000972 <validDigit>:
- 972:	20 53       	subi	r18, 0x30	; 48
+00000586 <notMwrite>:
+ 586:	d4 d0       	rcall	.+424    	; 0x730 <restoreBL>
+ 588:	db cf       	rjmp	.-74     	; 0x540 <notVariableLength>
+
+0000058a <isMwrite>:
+ 58a:	d2 d0       	rcall	.+420    	; 0x730 <restoreBL>
+ 58c:	06 30       	cpi	r16, 0x06	; 6
+ 58e:	09 f4       	brne	.+2      	; 0x592 <mwriteNot6>
+ 590:	89 c0       	rjmp	.+274    	; 0x6a4 <invalidArgument>
+
+00000592 <mwriteNot6>:
+ 592:	07 30       	cpi	r16, 0x07	; 7
+ 594:	39 f4       	brne	.+14     	; 0x5a4 <mwriteNot7>
+ 596:	c9 d0       	rcall	.+402    	; 0x72a <setZSpace>
+ 598:	01 e0       	ldi	r16, 0x01	; 1
+ 59a:	9f d0       	rcall	.+318    	; 0x6da <check>
+ 59c:	31 30       	cpi	r19, 0x01	; 1
+ 59e:	09 f0       	breq	.+2      	; 0x5a2 <mwrite7Valid>
+ 5a0:	a8 c0       	rjmp	.+336    	; 0x6f2 <invalidCommand>
+
+000005a2 <mwrite7Valid>:
+ 5a2:	80 c0       	rjmp	.+256    	; 0x6a4 <invalidArgument>
+
+000005a4 <mwriteNot7>:
+ 5a4:	c2 d0       	rcall	.+388    	; 0x72a <setZSpace>
+ 5a6:	01 e0       	ldi	r16, 0x01	; 1
+ 5a8:	98 d0       	rcall	.+304    	; 0x6da <check>
+ 5aa:	09 f0       	breq	.+2      	; 0x5ae <mwrite0>
+ 5ac:	a2 c0       	rjmp	.+324    	; 0x6f2 <invalidCommand>
+
+000005ae <mwrite0>:
+ 5ae:	12 e0       	ldi	r17, 0x02	; 2
+ 5b0:	e3 d1       	rcall	.+966    	; 0x978 <ahtoi>
+ 5b2:	33 23       	and	r19, r19
+ 5b4:	09 f4       	brne	.+2      	; 0x5b8 <mwriteADDRInvalid>
+ 5b6:	01 c0       	rjmp	.+2      	; 0x5ba <mwriteRange>
+
+000005b8 <mwriteADDRInvalid>:
+ 5b8:	75 c0       	rjmp	.+234    	; 0x6a4 <invalidArgument>
+
+000005ba <mwriteRange>:
+ 5ba:	d9 30       	cpi	r29, 0x09	; 9
+ 5bc:	08 f0       	brcs	.+2      	; 0x5c0 <mwriteADDRValid>
+ 5be:	72 c0       	rjmp	.+228    	; 0x6a4 <invalidArgument>
+
+000005c0 <mwriteADDRValid>:
+ 5c0:	b4 d0       	rcall	.+360    	; 0x72a <setZSpace>
+ 5c2:	01 e0       	ldi	r16, 0x01	; 1
+ 5c4:	8a d0       	rcall	.+276    	; 0x6da <check>
+ 5c6:	31 30       	cpi	r19, 0x01	; 1
+ 5c8:	09 f0       	breq	.+2      	; 0x5cc <mwriteADDRValid0>
+ 5ca:	6c c0       	rjmp	.+216    	; 0x6a4 <invalidArgument>
+
+000005cc <mwriteADDRValid0>:
+ 5cc:	cc 2e       	mov	r12, r28
+ 5ce:	dd 2e       	mov	r13, r29
+ 5d0:	11 e0       	ldi	r17, 0x01	; 1
+ 5d2:	d2 d1       	rcall	.+932    	; 0x978 <ahtoi>
+ 5d4:	cc 2d       	mov	r28, r12
+ 5d6:	dd 2d       	mov	r29, r13
+ 5d8:	33 23       	and	r19, r19
+ 5da:	09 f4       	brne	.+2      	; 0x5de <mwriteADDR0VALUEInvalid>
+ 5dc:	7a c0       	rjmp	.+244    	; 0x6d2 <done>
+
+000005de <mwriteADDR0VALUEInvalid>:
+ 5de:	62 c0       	rjmp	.+196    	; 0x6a4 <invalidArgument>
+
+000005e0 <isMread>:
+ 5e0:	a7 d0       	rcall	.+334    	; 0x730 <restoreBL>
+ 5e2:	05 30       	cpi	r16, 0x05	; 5
+ 5e4:	09 f4       	brne	.+2      	; 0x5e8 <mreadNot5>
+ 5e6:	5e c0       	rjmp	.+188    	; 0x6a4 <invalidArgument>
+
+000005e8 <mreadNot5>:
+ 5e8:	06 30       	cpi	r16, 0x06	; 6
+ 5ea:	39 f4       	brne	.+14     	; 0x5fa <mreadNot6>
+ 5ec:	9e d0       	rcall	.+316    	; 0x72a <setZSpace>
+ 5ee:	01 e0       	ldi	r16, 0x01	; 1
+ 5f0:	74 d0       	rcall	.+232    	; 0x6da <check>
+ 5f2:	31 30       	cpi	r19, 0x01	; 1
+ 5f4:	09 f0       	breq	.+2      	; 0x5f8 <mread6Valid>
+ 5f6:	7d c0       	rjmp	.+250    	; 0x6f2 <invalidCommand>
+
+000005f8 <mread6Valid>:
+ 5f8:	55 c0       	rjmp	.+170    	; 0x6a4 <invalidArgument>
+
+000005fa <mreadNot6>:
+ 5fa:	0a 30       	cpi	r16, 0x0A	; 10
+ 5fc:	31 f4       	brne	.+12     	; 0x60a <mreadNot10>
+ 5fe:	95 d0       	rcall	.+298    	; 0x72a <setZSpace>
+ 600:	01 e0       	ldi	r16, 0x01	; 1
+ 602:	6b d0       	rcall	.+214    	; 0x6da <check>
+ 604:	31 30       	cpi	r19, 0x01	; 1
+ 606:	11 f0       	breq	.+4      	; 0x60c <mreadADDR>
+ 608:	74 c0       	rjmp	.+232    	; 0x6f2 <invalidCommand>
+
+0000060a <mreadNot10>:
+ 60a:	4c c0       	rjmp	.+152    	; 0x6a4 <invalidArgument>
+
+0000060c <mreadADDR>:
+ 60c:	12 e0       	ldi	r17, 0x02	; 2
+ 60e:	b4 d1       	rcall	.+872    	; 0x978 <ahtoi>
+ 610:	33 23       	and	r19, r19
+ 612:	09 f4       	brne	.+2      	; 0x616 <mreadADDRInvalid>
+ 614:	01 c0       	rjmp	.+2      	; 0x618 <mreadRange>
+
+00000616 <mreadADDRInvalid>:
+ 616:	46 c0       	rjmp	.+140    	; 0x6a4 <invalidArgument>
+
+00000618 <mreadRange>:
+ 618:	d9 30       	cpi	r29, 0x09	; 9
+ 61a:	08 f0       	brcs	.+2      	; 0x61e <mreadValid>
+ 61c:	43 c0       	rjmp	.+134    	; 0x6a4 <invalidArgument>
+
+0000061e <mreadValid>:
+ 61e:	59 c0       	rjmp	.+178    	; 0x6d2 <done>
+
+00000620 <isIjmp>:
+ 620:	87 d0       	rcall	.+270    	; 0x730 <restoreBL>
+ 622:	04 30       	cpi	r16, 0x04	; 4
+ 624:	09 f4       	brne	.+2      	; 0x628 <ijmpNot4>
+ 626:	3e c0       	rjmp	.+124    	; 0x6a4 <invalidArgument>
+
+00000628 <ijmpNot4>:
+ 628:	05 30       	cpi	r16, 0x05	; 5
+ 62a:	39 f4       	brne	.+14     	; 0x63a <ijmpNot5>
+ 62c:	7e d0       	rcall	.+252    	; 0x72a <setZSpace>
+ 62e:	01 e0       	ldi	r16, 0x01	; 1
+ 630:	54 d0       	rcall	.+168    	; 0x6da <check>
+ 632:	31 30       	cpi	r19, 0x01	; 1
+ 634:	09 f0       	breq	.+2      	; 0x638 <ijmp5Valid>
+ 636:	5d c0       	rjmp	.+186    	; 0x6f2 <invalidCommand>
+
+00000638 <ijmp5Valid>:
+ 638:	35 c0       	rjmp	.+106    	; 0x6a4 <invalidArgument>
+
+0000063a <ijmpNot5>:
+ 63a:	09 30       	cpi	r16, 0x09	; 9
+ 63c:	31 f4       	brne	.+12     	; 0x64a <ijmpNot9>
+ 63e:	75 d0       	rcall	.+234    	; 0x72a <setZSpace>
+ 640:	01 e0       	ldi	r16, 0x01	; 1
+ 642:	4b d0       	rcall	.+150    	; 0x6da <check>
+ 644:	31 30       	cpi	r19, 0x01	; 1
+ 646:	11 f0       	breq	.+4      	; 0x64c <ijmpADDR>
+ 648:	54 c0       	rjmp	.+168    	; 0x6f2 <invalidCommand>
+
+0000064a <ijmpNot9>:
+ 64a:	2c c0       	rjmp	.+88     	; 0x6a4 <invalidArgument>
+
+0000064c <ijmpADDR>:
+ 64c:	12 e0       	ldi	r17, 0x02	; 2
+ 64e:	94 d1       	rcall	.+808    	; 0x978 <ahtoi>
+ 650:	33 23       	and	r19, r19
+ 652:	11 f4       	brne	.+4      	; 0x658 <ijmpADDRInvalid>
+ 654:	fe 01       	movw	r30, r28
+ 656:	01 c0       	rjmp	.+2      	; 0x65a <ijmpRange>
+
+00000658 <ijmpADDRInvalid>:
+ 658:	25 c0       	rjmp	.+74     	; 0x6a4 <invalidArgument>
+
+0000065a <ijmpRange>:
+ 65a:	f0 38       	cpi	r31, 0x80	; 128
+ 65c:	08 f0       	brcs	.+2      	; 0x660 <ijmpValid>
+ 65e:	22 c0       	rjmp	.+68     	; 0x6a4 <invalidArgument>
+
+00000660 <ijmpValid>:
+ 660:	f6 95       	lsr	r31
+ 662:	e7 95       	ror	r30
+ 664:	36 c0       	rjmp	.+108    	; 0x6d2 <done>
+
+00000666 <isEcho>:
+ 666:	64 d0       	rcall	.+200    	; 0x730 <restoreBL>
+ 668:	04 30       	cpi	r16, 0x04	; 4
+ 66a:	09 f4       	brne	.+2      	; 0x66e <echoNot4>
+ 66c:	32 c0       	rjmp	.+100    	; 0x6d2 <done>
+
+0000066e <echoNot4>:
+ 66e:	5d d0       	rcall	.+186    	; 0x72a <setZSpace>
+ 670:	01 e0       	ldi	r16, 0x01	; 1
+ 672:	33 d0       	rcall	.+102    	; 0x6da <check>
+ 674:	31 30       	cpi	r19, 0x01	; 1
+ 676:	09 f0       	breq	.+2      	; 0x67a <correctSyn>
+ 678:	3c c0       	rjmp	.+120    	; 0x6f2 <invalidCommand>
+
+0000067a <correctSyn>:
+ 67a:	2b c0       	rjmp	.+86     	; 0x6d2 <done>
+
+0000067c <mwriteADDR>:
+ 67c:	12 e0       	ldi	r17, 0x02	; 2
+ 67e:	7c d1       	rcall	.+760    	; 0x978 <ahtoi>
+ 680:	30 30       	cpi	r19, 0x00	; 0
+ 682:	81 f4       	brne	.+32     	; 0x6a4 <invalidArgument>
+ 684:	00 c0       	rjmp	.+0      	; 0x686 <mwriteADDR0>
+
+00000686 <mwriteADDR0>:
+ 686:	51 d0       	rcall	.+162    	; 0x72a <setZSpace>
+ 688:	01 e0       	ldi	r16, 0x01	; 1
+ 68a:	27 d0       	rcall	.+78     	; 0x6da <check>
+ 68c:	31 30       	cpi	r19, 0x01	; 1
+ 68e:	51 f4       	brne	.+20     	; 0x6a4 <invalidArgument>
+ 690:	00 c0       	rjmp	.+0      	; 0x692 <mwriteADDR0VV>
+
+00000692 <mwriteADDR0VV>:
+ 692:	cd 2e       	mov	r12, r29
+ 694:	dc 2e       	mov	r13, r28
+ 696:	11 e0       	ldi	r17, 0x01	; 1
+ 698:	6f d1       	rcall	.+734    	; 0x978 <ahtoi>
+ 69a:	30 30       	cpi	r19, 0x00	; 0
+ 69c:	19 f4       	brne	.+6      	; 0x6a4 <invalidArgument>
+ 69e:	dc 2d       	mov	r29, r12
+ 6a0:	cd 2d       	mov	r28, r13
+ 6a2:	17 c0       	rjmp	.+46     	; 0x6d2 <done>
+
+000006a4 <invalidArgument>:
+ 6a4:	4d ef       	ldi	r20, 0xFD	; 253
+ 6a6:	04 2e       	mov	r0, r20
+ 6a8:	08 95       	ret
+
+000006aa <char5>:
+ 6aa:	40 e3       	ldi	r20, 0x30	; 48
+ 6ac:	2f d0       	rcall	.+94     	; 0x70c <setZClear>
+ 6ae:	13 d0       	rcall	.+38     	; 0x6d6 <compareString>
+ 6b0:	31 30       	cpi	r19, 0x01	; 1
+ 6b2:	79 f0       	breq	.+30     	; 0x6d2 <done>
+ 6b4:	1e c0       	rjmp	.+60     	; 0x6f2 <invalidCommand>
+
+000006b6 <char4>:
+ 6b6:	40 e2       	ldi	r20, 0x20	; 32
+ 6b8:	20 d0       	rcall	.+64     	; 0x6fa <setZHelp>
+ 6ba:	0d d0       	rcall	.+26     	; 0x6d6 <compareString>
+ 6bc:	31 30       	cpi	r19, 0x01	; 1
+ 6be:	49 f0       	breq	.+18     	; 0x6d2 <done>
+ 6c0:	1f d0       	rcall	.+62     	; 0x700 <setZInfo>
+ 6c2:	09 d0       	rcall	.+18     	; 0x6d6 <compareString>
+ 6c4:	31 30       	cpi	r19, 0x01	; 1
+ 6c6:	29 f0       	breq	.+10     	; 0x6d2 <done>
+ 6c8:	1e d0       	rcall	.+60     	; 0x706 <setZRegs>
+ 6ca:	05 d0       	rcall	.+10     	; 0x6d6 <compareString>
+ 6cc:	31 30       	cpi	r19, 0x01	; 1
+ 6ce:	09 f0       	breq	.+2      	; 0x6d2 <done>
+ 6d0:	10 c0       	rjmp	.+32     	; 0x6f2 <invalidCommand>
+
+000006d2 <done>:
+ 6d2:	04 2e       	mov	r0, r20
+ 6d4:	08 95       	ret
+
+000006d6 <compareString>:
+ 6d6:	2c d0       	rcall	.+88     	; 0x730 <restoreBL>
+
+000006d8 <noRestoreBL>:
+ 6d8:	0b df       	rcall	.-490    	; 0x4f0 <resetXBuffer>
+
+000006da <check>:
+ 6da:	1d 91       	ld	r17, X+
+ 6dc:	25 91       	lpm	r18, Z+
+ 6de:	12 17       	cp	r17, r18
+ 6e0:	29 f4       	brne	.+10     	; 0x6ec <notMatch>
+ 6e2:	0a 95       	dec	r16
+ 6e4:	00 23       	and	r16, r16
+ 6e6:	c9 f7       	brne	.-14     	; 0x6da <check>
+
+000006e8 <match>:
+ 6e8:	31 e0       	ldi	r19, 0x01	; 1
+ 6ea:	08 95       	ret
+
+000006ec <notMatch>:
+ 6ec:	30 e0       	ldi	r19, 0x00	; 0
+ 6ee:	43 95       	inc	r20
+ 6f0:	08 95       	ret
+
+000006f2 <invalidCommand>:
+ 6f2:	fe de       	rcall	.-516    	; 0x4f0 <resetXBuffer>
+ 6f4:	1f ef       	ldi	r17, 0xFF	; 255
+ 6f6:	01 2e       	mov	r0, r17
+ 6f8:	08 95       	ret
+
+000006fa <setZHelp>:
+ 6fa:	f7 e0       	ldi	r31, 0x07	; 7
+ 6fc:	e6 e3       	ldi	r30, 0x36	; 54
+ 6fe:	08 95       	ret
+
+00000700 <setZInfo>:
+ 700:	f7 e0       	ldi	r31, 0x07	; 7
+ 702:	ea e3       	ldi	r30, 0x3A	; 58
+ 704:	08 95       	ret
+
+00000706 <setZRegs>:
+ 706:	f7 e0       	ldi	r31, 0x07	; 7
+ 708:	ee e3       	ldi	r30, 0x3E	; 62
+ 70a:	08 95       	ret
+
+0000070c <setZClear>:
+ 70c:	f7 e0       	ldi	r31, 0x07	; 7
+ 70e:	e2 e4       	ldi	r30, 0x42	; 66
+ 710:	08 95       	ret
+
+00000712 <setZEcho>:
+ 712:	f7 e0       	ldi	r31, 0x07	; 7
+ 714:	e7 e4       	ldi	r30, 0x47	; 71
+ 716:	08 95       	ret
+
+00000718 <setZIndirectJump>:
+ 718:	f7 e0       	ldi	r31, 0x07	; 7
+ 71a:	e7 e5       	ldi	r30, 0x57	; 87
+ 71c:	08 95       	ret
+
+0000071e <setZMwrite>:
+ 71e:	f7 e0       	ldi	r31, 0x07	; 7
+ 720:	e0 e5       	ldi	r30, 0x50	; 80
+ 722:	08 95       	ret
+
+00000724 <setZMread>:
+ 724:	f7 e0       	ldi	r31, 0x07	; 7
+ 726:	eb e4       	ldi	r30, 0x4B	; 75
+ 728:	08 95       	ret
+
+0000072a <setZSpace>:
+ 72a:	f7 e0       	ldi	r31, 0x07	; 7
+ 72c:	e6 e5       	ldi	r30, 0x56	; 86
+ 72e:	08 95       	ret
+
+00000730 <restoreBL>:
+ 730:	e2 de       	rcall	.-572    	; 0x4f6 <setYBL>
+ 732:	08 81       	ld	r16, Y
+ 734:	08 95       	ret
+
+00000736 <help>:
+ 736:	68 65       	ori	r22, 0x58	; 88
+ 738:	6c 70       	andi	r22, 0x0C	; 12
+
+0000073a <info>:
+ 73a:	69 6e       	ori	r22, 0xE9	; 233
+ 73c:	66 6f       	ori	r22, 0xF6	; 246
+
+0000073e <regs>:
+ 73e:	72 65       	ori	r23, 0x52	; 82
+ 740:	67 73       	andi	r22, 0x37	; 55
+
+00000742 <clear>:
+ 742:	63 6c       	ori	r22, 0xC3	; 195
+ 744:	65 61       	ori	r22, 0x15	; 21
+ 746:	72        	ori	r23, 0x52	; 82
+
+00000747 <echo>:
+ 747:	65 63       	ori	r22, 0x35	; 53
+ 749:	68 6f       	ori	r22, 0xF8	; 248
+
+0000074b <mread>:
+ 74b:	6d 72       	andi	r22, 0x2D	; 45
+ 74d:	65 61       	ori	r22, 0x15	; 21
+ 74f:	64        	ori	r22, 0xD4	; 212
+
+00000750 <mwrite>:
+ 750:	6d 77       	andi	r22, 0x7D	; 125
+ 752:	72 69       	ori	r23, 0x92	; 146
+ 754:	74 65       	ori	r23, 0x54	; 84
+
+00000756 <space>:
+ 756:	20        	ori	r18, 0x90	; 144
+
+00000757 <indirectJump>:
+ 757:	69 6a       	ori	r22, 0xA9	; 169
+ 759:	6d 70       	andi	r22, 0x0D	; 13
+	...
+
+0000075c <regsCommand>:
+ 75c:	00 27       	eor	r16, r16
+ 75e:	86 d0       	rcall	.+268    	; 0x86c <setZRegs>
+ 760:	ef 01       	movw	r28, r30
+
+00000762 <loop1>:
+ 762:	fe 01       	movw	r30, r28
+ 764:	95 91       	lpm	r25, Z+
+ 766:	ef 01       	movw	r28, r30
+ 768:	99 23       	and	r25, r25
+ 76a:	31 f0       	breq	.+12     	; 0x778 <done1>
+ 76c:	9d 30       	cpi	r25, 0x0D	; 13
+ 76e:	29 f0       	breq	.+10     	; 0x77a <newLine>
+ 770:	9a 30       	cpi	r25, 0x0A	; 10
+ 772:	29 f0       	breq	.+10     	; 0x77e <printRegs>
+ 774:	df dc       	rcall	.-1602   	; 0x134 <uartSend>
+ 776:	f5 cf       	rjmp	.-22     	; 0x762 <loop1>
+
+00000778 <done1>:
+ 778:	08 95       	ret
+
+0000077a <newLine>:
+ 77a:	5b dd       	rcall	.-1354   	; 0x232 <terminalNewLine>
+ 77c:	f2 cf       	rjmp	.-28     	; 0x762 <loop1>
+
+0000077e <printRegs>:
+ 77e:	ef 01       	movw	r28, r30
+ 780:	03 d0       	rcall	.+6      	; 0x788 <setZIjmpList>
+ 782:	e0 0f       	add	r30, r16
+ 784:	f1 1d       	adc	r31, r1
+ 786:	09 94       	ijmp
+
+00000788 <setZIjmpList>:
+ 788:	f3 e0       	ldi	r31, 0x03	; 3
+ 78a:	e7 ec       	ldi	r30, 0xC7	; 199
+ 78c:	08 95       	ret
+
+0000078e <ijmpList>:
+ 78e:	21 c0       	rjmp	.+66     	; 0x7d2 <r0>
+ 790:	22 c0       	rjmp	.+68     	; 0x7d6 <r1>
+ 792:	23 c0       	rjmp	.+70     	; 0x7da <r2>
+ 794:	24 c0       	rjmp	.+72     	; 0x7de <r3>
+ 796:	25 c0       	rjmp	.+74     	; 0x7e2 <r4>
+ 798:	26 c0       	rjmp	.+76     	; 0x7e6 <r5>
+ 79a:	27 c0       	rjmp	.+78     	; 0x7ea <r6>
+ 79c:	28 c0       	rjmp	.+80     	; 0x7ee <r7>
+ 79e:	29 c0       	rjmp	.+82     	; 0x7f2 <r8>
+ 7a0:	2a c0       	rjmp	.+84     	; 0x7f6 <r9>
+ 7a2:	2b c0       	rjmp	.+86     	; 0x7fa <r10>
+ 7a4:	2c c0       	rjmp	.+88     	; 0x7fe <r11>
+ 7a6:	2d c0       	rjmp	.+90     	; 0x802 <r12>
+ 7a8:	2e c0       	rjmp	.+92     	; 0x806 <r13>
+ 7aa:	2f c0       	rjmp	.+94     	; 0x80a <r14>
+ 7ac:	30 c0       	rjmp	.+96     	; 0x80e <r15>
+ 7ae:	31 c0       	rjmp	.+98     	; 0x812 <r16>
+ 7b0:	32 c0       	rjmp	.+100    	; 0x816 <r17>
+ 7b2:	33 c0       	rjmp	.+102    	; 0x81a <r18>
+ 7b4:	34 c0       	rjmp	.+104    	; 0x81e <r19>
+ 7b6:	35 c0       	rjmp	.+106    	; 0x822 <r20>
+ 7b8:	36 c0       	rjmp	.+108    	; 0x826 <r21>
+ 7ba:	36 c0       	rjmp	.+108    	; 0x828 <r22>
+ 7bc:	37 c0       	rjmp	.+110    	; 0x82c <r23>
+ 7be:	38 c0       	rjmp	.+112    	; 0x830 <r24>
+ 7c0:	39 c0       	rjmp	.+114    	; 0x834 <r25>
+ 7c2:	3a c0       	rjmp	.+116    	; 0x838 <X>
+ 7c4:	3d c0       	rjmp	.+122    	; 0x840 <Y>
+ 7c6:	40 c0       	rjmp	.+128    	; 0x848 <Z>
+ 7c8:	43 c0       	rjmp	.+134    	; 0x850 <PC>
+ 7ca:	49 c0       	rjmp	.+146    	; 0x85e <SP>
+
+000007cc <shortcut>:
+ 7cc:	cc dc       	rcall	.-1640   	; 0x166 <uartSendHex>
+ 7ce:	03 95       	inc	r16
+ 7d0:	c8 cf       	rjmp	.-112    	; 0x762 <loop1>
+
+000007d2 <r0>:
+ 7d2:	50 2d       	mov	r21, r0
+ 7d4:	fb cf       	rjmp	.-10     	; 0x7cc <shortcut>
+
+000007d6 <r1>:
+ 7d6:	51 2d       	mov	r21, r1
+ 7d8:	f9 cf       	rjmp	.-14     	; 0x7cc <shortcut>
+
+000007da <r2>:
+ 7da:	52 2d       	mov	r21, r2
+ 7dc:	f7 cf       	rjmp	.-18     	; 0x7cc <shortcut>
+
+000007de <r3>:
+ 7de:	53 2d       	mov	r21, r3
+ 7e0:	f5 cf       	rjmp	.-22     	; 0x7cc <shortcut>
+
+000007e2 <r4>:
+ 7e2:	54 2d       	mov	r21, r4
+ 7e4:	f3 cf       	rjmp	.-26     	; 0x7cc <shortcut>
+
+000007e6 <r5>:
+ 7e6:	55 2d       	mov	r21, r5
+ 7e8:	f1 cf       	rjmp	.-30     	; 0x7cc <shortcut>
+
+000007ea <r6>:
+ 7ea:	56 2d       	mov	r21, r6
+ 7ec:	ef cf       	rjmp	.-34     	; 0x7cc <shortcut>
+
+000007ee <r7>:
+ 7ee:	57 2d       	mov	r21, r7
+ 7f0:	ed cf       	rjmp	.-38     	; 0x7cc <shortcut>
+
+000007f2 <r8>:
+ 7f2:	58 2d       	mov	r21, r8
+ 7f4:	eb cf       	rjmp	.-42     	; 0x7cc <shortcut>
+
+000007f6 <r9>:
+ 7f6:	59 2d       	mov	r21, r9
+ 7f8:	e9 cf       	rjmp	.-46     	; 0x7cc <shortcut>
+
+000007fa <r10>:
+ 7fa:	5a 2d       	mov	r21, r10
+ 7fc:	e7 cf       	rjmp	.-50     	; 0x7cc <shortcut>
+
+000007fe <r11>:
+ 7fe:	5b 2d       	mov	r21, r11
+ 800:	e5 cf       	rjmp	.-54     	; 0x7cc <shortcut>
+
+00000802 <r12>:
+ 802:	5c 2d       	mov	r21, r12
+ 804:	e3 cf       	rjmp	.-58     	; 0x7cc <shortcut>
+
+00000806 <r13>:
+ 806:	5d 2d       	mov	r21, r13
+ 808:	e1 cf       	rjmp	.-62     	; 0x7cc <shortcut>
+
+0000080a <r14>:
+ 80a:	5e 2d       	mov	r21, r14
+ 80c:	df cf       	rjmp	.-66     	; 0x7cc <shortcut>
+
+0000080e <r15>:
+ 80e:	5f 2d       	mov	r21, r15
+ 810:	dd cf       	rjmp	.-70     	; 0x7cc <shortcut>
+
+00000812 <r16>:
+ 812:	50 2f       	mov	r21, r16
+ 814:	db cf       	rjmp	.-74     	; 0x7cc <shortcut>
+
+00000816 <r17>:
+ 816:	51 2f       	mov	r21, r17
+ 818:	d9 cf       	rjmp	.-78     	; 0x7cc <shortcut>
+
+0000081a <r18>:
+ 81a:	52 2f       	mov	r21, r18
+ 81c:	d7 cf       	rjmp	.-82     	; 0x7cc <shortcut>
+
+0000081e <r19>:
+ 81e:	53 2f       	mov	r21, r19
+ 820:	d5 cf       	rjmp	.-86     	; 0x7cc <shortcut>
+
+00000822 <r20>:
+ 822:	54 2f       	mov	r21, r20
+ 824:	d3 cf       	rjmp	.-90     	; 0x7cc <shortcut>
+
+00000826 <r21>:
+ 826:	d2 cf       	rjmp	.-92     	; 0x7cc <shortcut>
+
+00000828 <r22>:
+ 828:	56 2f       	mov	r21, r22
+ 82a:	d0 cf       	rjmp	.-96     	; 0x7cc <shortcut>
+
+0000082c <r23>:
+ 82c:	57 2f       	mov	r21, r23
+ 82e:	ce cf       	rjmp	.-100    	; 0x7cc <shortcut>
+
+00000830 <r24>:
+ 830:	58 2f       	mov	r21, r24
+ 832:	cc cf       	rjmp	.-104    	; 0x7cc <shortcut>
+
+00000834 <r25>:
+ 834:	59 2f       	mov	r21, r25
+ 836:	ca cf       	rjmp	.-108    	; 0x7cc <shortcut>
+
+00000838 <X>:
+ 838:	5b 2f       	mov	r21, r27
+ 83a:	95 dc       	rcall	.-1750   	; 0x166 <uartSendHex>
+ 83c:	5a 2f       	mov	r21, r26
+ 83e:	c6 cf       	rjmp	.-116    	; 0x7cc <shortcut>
+
+00000840 <Y>:
+ 840:	5d 2f       	mov	r21, r29
+ 842:	91 dc       	rcall	.-1758   	; 0x166 <uartSendHex>
+ 844:	5c 2f       	mov	r21, r28
+ 846:	c2 cf       	rjmp	.-124    	; 0x7cc <shortcut>
+
+00000848 <Z>:
+ 848:	5f 2f       	mov	r21, r31
+ 84a:	8d dc       	rcall	.-1766   	; 0x166 <uartSendHex>
+ 84c:	5e 2f       	mov	r21, r30
+ 84e:	be cf       	rjmp	.-132    	; 0x7cc <shortcut>
+
+00000850 <PC>:
+ 850:	00 d0       	rcall	.+0      	; 0x852 <L0^A>
+
+00000852 <L0^A>:
+ 852:	1f 91       	pop	r17
+ 854:	2f 91       	pop	r18
+ 856:	52 2f       	mov	r21, r18
+ 858:	86 dc       	rcall	.-1780   	; 0x166 <uartSendHex>
+ 85a:	51 2f       	mov	r21, r17
+ 85c:	b7 cf       	rjmp	.-146    	; 0x7cc <shortcut>
+
+0000085e <SP>:
+ 85e:	50 91 5e 00 	lds	r21, 0x005E	; 0x80005e <__TEXT_REGION_LENGTH__+0x7e005e>
+ 862:	81 dc       	rcall	.-1790   	; 0x166 <uartSendHex>
+ 864:	50 91 5d 00 	lds	r21, 0x005D	; 0x80005d <__TEXT_REGION_LENGTH__+0x7e005d>
+ 868:	7e dc       	rcall	.-1796   	; 0x166 <uartSendHex>
+ 86a:	86 cf       	rjmp	.-244    	; 0x778 <done1>
+
+0000086c <setZRegs>:
+ 86c:	f8 e0       	ldi	r31, 0x08	; 8
+ 86e:	e2 e7       	ldi	r30, 0x72	; 114
+ 870:	08 95       	ret
+
+00000872 <regsMessage>:
+ 872:	72 30       	cpi	r23, 0x02	; 2
+ 874:	3a 30       	cpi	r19, 0x0A	; 10
+ 876:	78 0a       	sbc	r7, r24
+ 878:	20 72       	andi	r18, 0x20	; 32
+ 87a:	31 3a       	cpi	r19, 0xA1	; 161
+ 87c:	30 78       	andi	r19, 0x80	; 128
+ 87e:	0a 20       	and	r0, r10
+ 880:	72 32       	cpi	r23, 0x22	; 34
+ 882:	3a 30       	cpi	r19, 0x0A	; 10
+ 884:	78 0a       	sbc	r7, r24
+ 886:	20 72       	andi	r18, 0x20	; 32
+ 888:	33 3a       	cpi	r19, 0xA3	; 163
+ 88a:	30 78       	andi	r19, 0x80	; 128
+ 88c:	0a 20       	and	r0, r10
+ 88e:	72 34       	cpi	r23, 0x42	; 66
+ 890:	3a 30       	cpi	r19, 0x0A	; 10
+ 892:	78 0a       	sbc	r7, r24
+ 894:	20 72       	andi	r18, 0x20	; 32
+ 896:	35 3a       	cpi	r19, 0xA5	; 165
+ 898:	30 78       	andi	r19, 0x80	; 128
+ 89a:	0a 0d       	add	r16, r10
+ 89c:	72 36       	cpi	r23, 0x62	; 98
+ 89e:	3a 30       	cpi	r19, 0x0A	; 10
+ 8a0:	78 0a       	sbc	r7, r24
+ 8a2:	20 72       	andi	r18, 0x20	; 32
+ 8a4:	37 3a       	cpi	r19, 0xA7	; 167
+ 8a6:	30 78       	andi	r19, 0x80	; 128
+ 8a8:	0a 20       	and	r0, r10
+ 8aa:	72 38       	cpi	r23, 0x82	; 130
+ 8ac:	3a 30       	cpi	r19, 0x0A	; 10
+ 8ae:	78 0a       	sbc	r7, r24
+ 8b0:	20 72       	andi	r18, 0x20	; 32
+ 8b2:	39 3a       	cpi	r19, 0xA9	; 169
+ 8b4:	30 78       	andi	r19, 0x80	; 128
+ 8b6:	0a 20       	and	r0, r10
+ 8b8:	72 31       	cpi	r23, 0x12	; 18
+ 8ba:	30 3a       	cpi	r19, 0xA0	; 160
+ 8bc:	30 78       	andi	r19, 0x80	; 128
+ 8be:	0a 20       	and	r0, r10
+ 8c0:	72 31       	cpi	r23, 0x12	; 18
+ 8c2:	31 3a       	cpi	r19, 0xA1	; 161
+ 8c4:	30 78       	andi	r19, 0x80	; 128
+ 8c6:	0a 0d       	add	r16, r10
+ 8c8:	72 31       	cpi	r23, 0x12	; 18
+ 8ca:	32 3a       	cpi	r19, 0xA2	; 162
+ 8cc:	30 78       	andi	r19, 0x80	; 128
+ 8ce:	0a 20       	and	r0, r10
+ 8d0:	72 31       	cpi	r23, 0x12	; 18
+ 8d2:	33 3a       	cpi	r19, 0xA3	; 163
+ 8d4:	30 78       	andi	r19, 0x80	; 128
+ 8d6:	0a 20       	and	r0, r10
+ 8d8:	72 31       	cpi	r23, 0x12	; 18
+ 8da:	34 3a       	cpi	r19, 0xA4	; 164
+ 8dc:	30 78       	andi	r19, 0x80	; 128
+ 8de:	0a 20       	and	r0, r10
+ 8e0:	72 31       	cpi	r23, 0x12	; 18
+ 8e2:	35 3a       	cpi	r19, 0xA5	; 165
+ 8e4:	30 78       	andi	r19, 0x80	; 128
+ 8e6:	0a 20       	and	r0, r10
+ 8e8:	72 31       	cpi	r23, 0x12	; 18
+ 8ea:	36 3a       	cpi	r19, 0xA6	; 166
+ 8ec:	30 78       	andi	r19, 0x80	; 128
+ 8ee:	0a 20       	and	r0, r10
+ 8f0:	72 31       	cpi	r23, 0x12	; 18
+ 8f2:	37 3a       	cpi	r19, 0xA7	; 167
+ 8f4:	30 78       	andi	r19, 0x80	; 128
+ 8f6:	0a 0d       	add	r16, r10
+ 8f8:	72 31       	cpi	r23, 0x12	; 18
+ 8fa:	38 3a       	cpi	r19, 0xA8	; 168
+ 8fc:	30 78       	andi	r19, 0x80	; 128
+ 8fe:	0a 20       	and	r0, r10
+ 900:	72 31       	cpi	r23, 0x12	; 18
+ 902:	39 3a       	cpi	r19, 0xA9	; 169
+ 904:	30 78       	andi	r19, 0x80	; 128
+ 906:	0a 20       	and	r0, r10
+ 908:	72 32       	cpi	r23, 0x22	; 34
+ 90a:	30 3a       	cpi	r19, 0xA0	; 160
+ 90c:	30 78       	andi	r19, 0x80	; 128
+ 90e:	0a 20       	and	r0, r10
+ 910:	72 32       	cpi	r23, 0x22	; 34
+ 912:	31 3a       	cpi	r19, 0xA1	; 161
+ 914:	30 78       	andi	r19, 0x80	; 128
+ 916:	0a 20       	and	r0, r10
+ 918:	72 32       	cpi	r23, 0x22	; 34
+ 91a:	32 3a       	cpi	r19, 0xA2	; 162
+ 91c:	30 78       	andi	r19, 0x80	; 128
+ 91e:	0a 20       	and	r0, r10
+ 920:	72 32       	cpi	r23, 0x22	; 34
+ 922:	33 3a       	cpi	r19, 0xA3	; 163
+ 924:	30 78       	andi	r19, 0x80	; 128
+ 926:	0a 0d       	add	r16, r10
+ 928:	72 32       	cpi	r23, 0x22	; 34
+ 92a:	34 3a       	cpi	r19, 0xA4	; 164
+ 92c:	30 78       	andi	r19, 0x80	; 128
+ 92e:	0a 20       	and	r0, r10
+ 930:	72 32       	cpi	r23, 0x22	; 34
+ 932:	35 3a       	cpi	r19, 0xA5	; 165
+ 934:	30 78       	andi	r19, 0x80	; 128
+ 936:	0a 20       	and	r0, r10
+ 938:	58 3a       	cpi	r21, 0xA8	; 168
+ 93a:	30 78       	andi	r19, 0x80	; 128
+ 93c:	0a 20       	and	r0, r10
+ 93e:	59 3a       	cpi	r21, 0xA9	; 169
+ 940:	30 78       	andi	r19, 0x80	; 128
+ 942:	0a 20       	and	r0, r10
+ 944:	5a 3a       	cpi	r21, 0xAA	; 170
+ 946:	30 78       	andi	r19, 0x80	; 128
+ 948:	0a 20       	and	r0, r10
+ 94a:	50 43       	sbci	r21, 0x30	; 48
+ 94c:	3a 30       	cpi	r19, 0x0A	; 10
+ 94e:	78 0a       	sbc	r7, r24
+ 950:	0d 53       	subi	r16, 0x3D	; 61
+ 952:	50 3a       	cpi	r21, 0xA0	; 160
+ 954:	30 78       	andi	r19, 0x80	; 128
+ 956:	0a 00       	.word	0x000a	; ????
+
+00000958 <echoCommand>:
+ 958:	ce dd       	rcall	.-1124   	; 0x4f6 <setYBL>
+ 95a:	08 81       	ld	r16, Y
+ 95c:	04 30       	cpi	r16, 0x04	; 4
+ 95e:	09 f4       	brne	.+2      	; 0x962 <argumentProvided>
+ 960:	0a c0       	rjmp	.+20     	; 0x976 <noArg>
+
+00000962 <argumentProvided>:
+ 962:	c6 dd       	rcall	.-1140   	; 0x4f0 <resetXBuffer>
+ 964:	15 96       	adiw	r26, 0x05	; 5
+ 966:	05 50       	subi	r16, 0x05	; 5
+
+00000968 <loop1>:
+ 968:	00 23       	and	r16, r16
+ 96a:	21 f0       	breq	.+8      	; 0x974 <done1>
+ 96c:	9d 91       	ld	r25, X+
+ 96e:	e2 db       	rcall	.-2108   	; 0x134 <uartSend>
+ 970:	0a 95       	dec	r16
+ 972:	fa cf       	rjmp	.-12     	; 0x968 <loop1>
+
+00000974 <done1>:
  974:	08 95       	ret
 
-00000976 <validLetterUppercase>:
- 976:	27 53       	subi	r18, 0x37	; 55
- 978:	08 95       	ret
+00000976 <noArg>:
+ 976:	08 95       	ret
 
-0000097a <validLetterLowercase>:
- 97a:	27 55       	subi	r18, 0x57	; 87
- 97c:	08 95       	ret
+00000978 <ahtoi>:
+ 978:	33 27       	eor	r19, r19
+ 97a:	cc 27       	eor	r28, r28
+ 97c:	dd 27       	eor	r29, r29
+ 97e:	ee 27       	eor	r30, r30
+ 980:	ff 27       	eor	r31, r31
+ 982:	12 30       	cpi	r17, 0x02	; 2
+ 984:	09 f0       	breq	.+2      	; 0x988 <ahtoiword>
+ 986:	25 c0       	rjmp	.+74     	; 0x9d2 <ahtoibyte>
 
-0000097e <invalidChar>:
- 97e:	31 e0       	ldi	r19, 0x01	; 1
- 980:	08 95       	ret
+00000988 <ahtoiword>:
+ 988:	2d 91       	ld	r18, X+
+ 98a:	2f d0       	rcall	.+94     	; 0x9ea <isValidChar>
+ 98c:	31 30       	cpi	r19, 0x01	; 1
+ 98e:	f1 f0       	breq	.+60     	; 0x9cc <abort>
+ 990:	c2 2f       	mov	r28, r18
+ 992:	48 d0       	rcall	.+144    	; 0xa24 <Yx16>
+ 994:	47 d0       	rcall	.+142    	; 0xa24 <Yx16>
+ 996:	46 d0       	rcall	.+140    	; 0xa24 <Yx16>
 
-00000982 <bytex16>:
- 982:	22 0f       	add	r18, r18
- 984:	22 0f       	add	r18, r18
- 986:	22 0f       	add	r18, r18
- 988:	22 0f       	add	r18, r18
- 98a:	08 95       	ret
+00000998 <char2>:
+ 998:	2d 91       	ld	r18, X+
+ 99a:	27 d0       	rcall	.+78     	; 0x9ea <isValidChar>
+ 99c:	31 30       	cpi	r19, 0x01	; 1
+ 99e:	b1 f0       	breq	.+44     	; 0x9cc <abort>
+ 9a0:	e2 2f       	mov	r30, r18
+ 9a2:	49 d0       	rcall	.+146    	; 0xa36 <Zx16>
+ 9a4:	48 d0       	rcall	.+144    	; 0xa36 <Zx16>
+ 9a6:	ce 0f       	add	r28, r30
+ 9a8:	df 1f       	adc	r29, r31
 
-0000098c <Yx16>:
- 98c:	cc 0f       	add	r28, r28
- 98e:	dd 1f       	adc	r29, r29
- 990:	cc 0f       	add	r28, r28
- 992:	dd 1f       	adc	r29, r29
- 994:	cc 0f       	add	r28, r28
- 996:	dd 1f       	adc	r29, r29
- 998:	cc 0f       	add	r28, r28
- 99a:	dd 1f       	adc	r29, r29
- 99c:	08 95       	ret
+000009aa <char3>:
+ 9aa:	2d 91       	ld	r18, X+
+ 9ac:	1e d0       	rcall	.+60     	; 0x9ea <isValidChar>
+ 9ae:	31 30       	cpi	r19, 0x01	; 1
+ 9b0:	69 f0       	breq	.+26     	; 0x9cc <abort>
+ 9b2:	ee 27       	eor	r30, r30
+ 9b4:	ff 27       	eor	r31, r31
+ 9b6:	e2 2f       	mov	r30, r18
+ 9b8:	3e d0       	rcall	.+124    	; 0xa36 <Zx16>
+ 9ba:	ce 0f       	add	r28, r30
+ 9bc:	df 1f       	adc	r29, r31
 
-0000099e <Zx16>:
- 99e:	ee 0f       	add	r30, r30
- 9a0:	ff 1f       	adc	r31, r31
- 9a2:	ee 0f       	add	r30, r30
- 9a4:	ff 1f       	adc	r31, r31
- 9a6:	ee 0f       	add	r30, r30
- 9a8:	ff 1f       	adc	r31, r31
- 9aa:	ee 0f       	add	r30, r30
- 9ac:	ff 1f       	adc	r31, r31
- 9ae:	08 95       	ret
+000009be <char4>:
+ 9be:	2d 91       	ld	r18, X+
+ 9c0:	14 d0       	rcall	.+40     	; 0x9ea <isValidChar>
+ 9c2:	31 30       	cpi	r19, 0x01	; 1
+ 9c4:	19 f0       	breq	.+6      	; 0x9cc <abort>
+ 9c6:	c2 0f       	add	r28, r18
+ 9c8:	d1 1d       	adc	r29, r1
+ 9ca:	08 95       	ret
 
-000009b0 <mwrite>:
- 9b0:	28 82       	st	Y, r2
- 9b2:	1d d0       	rcall	.+58     	; 0x9ee <setZWriteMessage>
+000009cc <abort>:
+ 9cc:	2d ef       	ldi	r18, 0xFD	; 253
+ 9ce:	02 2e       	mov	r0, r18
+ 9d0:	08 95       	ret
 
-000009b4 <loop2>:
- 9b4:	95 91       	lpm	r25, Z+
- 9b6:	9a 30       	cpi	r25, 0x0A	; 10
- 9b8:	21 f0       	breq	.+8      	; 0x9c2 <valuer2>
- 9ba:	9d 30       	cpi	r25, 0x0D	; 13
- 9bc:	39 f0       	breq	.+14     	; 0x9cc <addressY>
- 9be:	9e db       	rcall	.-2244   	; 0xfc <uartSend>
- 9c0:	f9 cf       	rjmp	.-14     	; 0x9b4 <loop2>
+000009d2 <ahtoibyte>:
+ 9d2:	2d 91       	ld	r18, X+
+ 9d4:	0a d0       	rcall	.+20     	; 0x9ea <isValidChar>
+ 9d6:	31 30       	cpi	r19, 0x01	; 1
+ 9d8:	c9 f3       	breq	.-14     	; 0x9cc <abort>
+ 9da:	1f d0       	rcall	.+62     	; 0xa1a <bytex16>
+ 9dc:	22 2e       	mov	r2, r18
 
-000009c2 <valuer2>:
- 9c2:	52 2d       	mov	r21, r2
- 9c4:	b4 db       	rcall	.-2200   	; 0x12e <uartSendHex>
- 9c6:	13 d0       	rcall	.+38     	; 0x9ee <setZWriteMessage>
- 9c8:	71 96       	adiw	r30, 0x11	; 17
- 9ca:	f4 cf       	rjmp	.-24     	; 0x9b4 <loop2>
+000009de <char2b>:
+ 9de:	2d 91       	ld	r18, X+
+ 9e0:	04 d0       	rcall	.+8      	; 0x9ea <isValidChar>
+ 9e2:	31 30       	cpi	r19, 0x01	; 1
+ 9e4:	99 f3       	breq	.-26     	; 0x9cc <abort>
+ 9e6:	22 0e       	add	r2, r18
+ 9e8:	08 95       	ret
 
-000009cc <addressY>:
- 9cc:	5d 2f       	mov	r21, r29
- 9ce:	af db       	rcall	.-2210   	; 0x12e <uartSendHex>
- 9d0:	5c 2f       	mov	r21, r28
- 9d2:	ad db       	rcall	.-2214   	; 0x12e <uartSendHex>
- 9d4:	08 95       	ret
+000009ea <isValidChar>:
+ 9ea:	21 36       	cpi	r18, 0x61	; 97
+ 9ec:	40 f4       	brcc	.+16     	; 0x9fe <lowerLetterRangeLowercase>
+ 9ee:	21 34       	cpi	r18, 0x41	; 65
+ 9f0:	48 f4       	brcc	.+18     	; 0xa04 <lowerLetterRangeUppercase>
+ 9f2:	20 33       	cpi	r18, 0x30	; 48
+ 9f4:	08 f4       	brcc	.+2      	; 0x9f8 <lowerDigitRange>
+ 9f6:	0f c0       	rjmp	.+30     	; 0xa16 <invalidChar>
 
-000009d6 <mread>:
- 9d6:	08 d0       	rcall	.+16     	; 0x9e8 <setZReadMessage>
+000009f8 <lowerDigitRange>:
+ 9f8:	2a 33       	cpi	r18, 0x3A	; 58
+ 9fa:	38 f0       	brcs	.+14     	; 0xa0a <validDigit>
+ 9fc:	0c c0       	rjmp	.+24     	; 0xa16 <invalidChar>
 
-000009d8 <loop1>:
- 9d8:	95 91       	lpm	r25, Z+
- 9da:	9a 30       	cpi	r25, 0x0A	; 10
- 9dc:	11 f0       	breq	.+4      	; 0x9e2 <printValue>
- 9de:	8e db       	rcall	.-2276   	; 0xfc <uartSend>
- 9e0:	fb cf       	rjmp	.-10     	; 0x9d8 <loop1>
+000009fe <lowerLetterRangeLowercase>:
+ 9fe:	27 36       	cpi	r18, 0x67	; 103
+ a00:	40 f0       	brcs	.+16     	; 0xa12 <validLetterLowercase>
+ a02:	09 c0       	rjmp	.+18     	; 0xa16 <invalidChar>
 
-000009e2 <printValue>:
- 9e2:	58 81       	ld	r21, Y
- 9e4:	a4 db       	rcall	.-2232   	; 0x12e <uartSendHex>
- 9e6:	08 95       	ret
+00000a04 <lowerLetterRangeUppercase>:
+ a04:	27 34       	cpi	r18, 0x47	; 71
+ a06:	18 f0       	brcs	.+6      	; 0xa0e <validLetterUppercase>
+ a08:	06 c0       	rjmp	.+12     	; 0xa16 <invalidChar>
 
-000009e8 <setZReadMessage>:
- 9e8:	f9 e0       	ldi	r31, 0x09	; 9
- 9ea:	e4 ef       	ldi	r30, 0xF4	; 244
- 9ec:	08 95       	ret
+00000a0a <validDigit>:
+ a0a:	20 53       	subi	r18, 0x30	; 48
+ a0c:	08 95       	ret
 
-000009ee <setZWriteMessage>:
- 9ee:	fa e0       	ldi	r31, 0x0A	; 10
- 9f0:	e9 e0       	ldi	r30, 0x09	; 9
- 9f2:	08 95       	ret
+00000a0e <validLetterUppercase>:
+ a0e:	27 53       	subi	r18, 0x37	; 55
+ a10:	08 95       	ret
 
-000009f4 <readMessage>:
- 9f4:	56 61       	ori	r21, 0x16	; 22
- 9f6:	6c 75       	andi	r22, 0x5C	; 92
- 9f8:	65 20       	and	r6, r5
- 9fa:	6f 66       	ori	r22, 0x6F	; 111
- 9fc:	20 61       	ori	r18, 0x10	; 16
- 9fe:	64 64       	ori	r22, 0x44	; 68
- a00:	72 65       	ori	r23, 0x52	; 82
- a02:	73 73       	andi	r23, 0x33	; 51
- a04:	3a 20       	and	r3, r10
- a06:	30 78       	andi	r19, 0x80	; 128
- a08:	Address 0xa08 is out of bounds.
+00000a12 <validLetterLowercase>:
+ a12:	27 55       	subi	r18, 0x57	; 87
+ a14:	08 95       	ret
 
+00000a16 <invalidChar>:
+ a16:	31 e0       	ldi	r19, 0x01	; 1
+ a18:	08 95       	ret
 
-00000a09 <writeMessage>:
- a09:	57 72       	andi	r21, 0x27	; 39
- a0b:	69 74       	andi	r22, 0x49	; 73
- a0d:	74 65       	ori	r23, 0x54	; 84
- a0f:	6e 20       	and	r6, r14
- a11:	76 61       	ori	r23, 0x16	; 22
- a13:	6c 75       	andi	r22, 0x5C	; 92
- a15:	65 20       	and	r6, r5
- a17:	30 78       	andi	r19, 0x80	; 128
- a19:	0a 20       	and	r0, r10
- a1b:	74 6f       	ori	r23, 0xF4	; 244
- a1d:	20 61       	ori	r18, 0x10	; 16
- a1f:	64 64       	ori	r22, 0x44	; 68
- a21:	72 65       	ori	r23, 0x52	; 82
- a23:	73 73       	andi	r23, 0x33	; 51
- a25:	20 30       	cpi	r18, 0x00	; 0
- a27:	78 0d       	add	r23, r8
+00000a1a <bytex16>:
+ a1a:	22 0f       	add	r18, r18
+ a1c:	22 0f       	add	r18, r18
+ a1e:	22 0f       	add	r18, r18
+ a20:	22 0f       	add	r18, r18
+ a22:	08 95       	ret
+
+00000a24 <Yx16>:
+ a24:	cc 0f       	add	r28, r28
+ a26:	dd 1f       	adc	r29, r29
+ a28:	cc 0f       	add	r28, r28
+ a2a:	dd 1f       	adc	r29, r29
+ a2c:	cc 0f       	add	r28, r28
+ a2e:	dd 1f       	adc	r29, r29
+ a30:	cc 0f       	add	r28, r28
+ a32:	dd 1f       	adc	r29, r29
+ a34:	08 95       	ret
+
+00000a36 <Zx16>:
+ a36:	ee 0f       	add	r30, r30
+ a38:	ff 1f       	adc	r31, r31
+ a3a:	ee 0f       	add	r30, r30
+ a3c:	ff 1f       	adc	r31, r31
+ a3e:	ee 0f       	add	r30, r30
+ a40:	ff 1f       	adc	r31, r31
+ a42:	ee 0f       	add	r30, r30
+ a44:	ff 1f       	adc	r31, r31
+ a46:	08 95       	ret
+
+00000a48 <mwrite>:
+ a48:	28 82       	st	Y, r2
+ a4a:	1d d0       	rcall	.+58     	; 0xa86 <setZWriteMessage>
+
+00000a4c <loop2>:
+ a4c:	95 91       	lpm	r25, Z+
+ a4e:	9a 30       	cpi	r25, 0x0A	; 10
+ a50:	21 f0       	breq	.+8      	; 0xa5a <valuer2>
+ a52:	9d 30       	cpi	r25, 0x0D	; 13
+ a54:	39 f0       	breq	.+14     	; 0xa64 <addressY>
+ a56:	6e db       	rcall	.-2340   	; 0x134 <uartSend>
+ a58:	f9 cf       	rjmp	.-14     	; 0xa4c <loop2>
+
+00000a5a <valuer2>:
+ a5a:	52 2d       	mov	r21, r2
+ a5c:	84 db       	rcall	.-2296   	; 0x166 <uartSendHex>
+ a5e:	13 d0       	rcall	.+38     	; 0xa86 <setZWriteMessage>
+ a60:	71 96       	adiw	r30, 0x11	; 17
+ a62:	f4 cf       	rjmp	.-24     	; 0xa4c <loop2>
+
+00000a64 <addressY>:
+ a64:	5d 2f       	mov	r21, r29
+ a66:	7f db       	rcall	.-2306   	; 0x166 <uartSendHex>
+ a68:	5c 2f       	mov	r21, r28
+ a6a:	7d db       	rcall	.-2310   	; 0x166 <uartSendHex>
+ a6c:	08 95       	ret
+
+00000a6e <mread>:
+ a6e:	08 d0       	rcall	.+16     	; 0xa80 <setZReadMessage>
+
+00000a70 <loop1>:
+ a70:	95 91       	lpm	r25, Z+
+ a72:	9a 30       	cpi	r25, 0x0A	; 10
+ a74:	11 f0       	breq	.+4      	; 0xa7a <printValue>
+ a76:	5e db       	rcall	.-2372   	; 0x134 <uartSend>
+ a78:	fb cf       	rjmp	.-10     	; 0xa70 <loop1>
+
+00000a7a <printValue>:
+ a7a:	58 81       	ld	r21, Y
+ a7c:	74 db       	rcall	.-2328   	; 0x166 <uartSendHex>
+ a7e:	08 95       	ret
+
+00000a80 <setZReadMessage>:
+ a80:	fa e0       	ldi	r31, 0x0A	; 10
+ a82:	ec e8       	ldi	r30, 0x8C	; 140
+ a84:	08 95       	ret
+
+00000a86 <setZWriteMessage>:
+ a86:	fa e0       	ldi	r31, 0x0A	; 10
+ a88:	e1 ea       	ldi	r30, 0xA1	; 161
+ a8a:	08 95       	ret
+
+00000a8c <readMessage>:
+ a8c:	56 61       	ori	r21, 0x16	; 22
+ a8e:	6c 75       	andi	r22, 0x5C	; 92
+ a90:	65 20       	and	r6, r5
+ a92:	6f 66       	ori	r22, 0x6F	; 111
+ a94:	20 61       	ori	r18, 0x10	; 16
+ a96:	64 64       	ori	r22, 0x44	; 68
+ a98:	72 65       	ori	r23, 0x52	; 82
+ a9a:	73 73       	andi	r23, 0x33	; 51
+ a9c:	3a 20       	and	r3, r10
+ a9e:	30 78       	andi	r19, 0x80	; 128
+ aa0:	0a        	subi	r16, 0x7A	; 122
+
+00000aa1 <writeMessage>:
+ aa1:	57 72       	andi	r21, 0x27	; 39
+ aa3:	69 74       	andi	r22, 0x49	; 73
+ aa5:	74 65       	ori	r23, 0x54	; 84
+ aa7:	6e 20       	and	r6, r14
+ aa9:	76 61       	ori	r23, 0x16	; 22
+ aab:	6c 75       	andi	r22, 0x5C	; 92
+ aad:	65 20       	and	r6, r5
+ aaf:	30 78       	andi	r19, 0x80	; 128
+ ab1:	0a 20       	and	r0, r10
+ ab3:	74 6f       	ori	r23, 0xF4	; 244
+ ab5:	20 61       	ori	r18, 0x10	; 16
+ ab7:	64 64       	ori	r22, 0x44	; 68
+ ab9:	72 65       	ori	r23, 0x52	; 82
+ abb:	73 73       	andi	r23, 0x33	; 51
+ abd:	20 30       	cpi	r18, 0x00	; 0
+ abf:	78 0d       	add	r23, r8
+	...
+
+Disassembly of section .avr.prop:
+
+00000000 <__eeprom_end-0x810000>:
+   0:	01 00       	.word	0x0001	; ????
+   2:	02 00       	.word	0x0002	; ????
+   4:	14 01       	movw	r2, r8
+   6:	00 00       	nop
+   8:	02 01       	movw	r0, r4
+   a:	00 00       	nop
+   c:	00 14       	cp	r0, r0
+   e:	01 00       	.word	0x0001	; ????
+  10:	00 02       	muls	r16, r16
+  12:	01 00       	.word	0x0001	; ????
+  14:	00 00       	nop
+  16:	01 00       	.word	0x0001	; ????
+  18:	02 00       	.word	0x0002	; ????
+  1a:	9e 03       	fmulsu	r17, r22
+  1c:	00 00       	nop
+  1e:	02 01       	movw	r0, r4
+  20:	00 00       	nop
+  22:	00 9e       	mul	r0, r16
+  24:	03 00       	.word	0x0003	; ????
+  26:	00 02       	muls	r16, r16
+  28:	01 00       	.word	0x0001	; ????
+  2a:	00 00       	nop
+  2c:	01 00       	.word	0x0001	; ????
+  2e:	02 00       	.word	0x0002	; ????
+  30:	c2 04       	cpc	r12, r2
+  32:	00 00       	nop
+  34:	02 01       	movw	r0, r4
+  36:	00 00       	nop
+  38:	00 c2       	rjmp	.+1024   	; 0x43a <__FUSE_REGION_LENGTH__+0x3a>
+  3a:	04 00       	.word	0x0004	; ????
+  3c:	00 02       	muls	r16, r16
+  3e:	01 00       	.word	0x0001	; ????
+  40:	00 00       	nop
+  42:	01 00       	.word	0x0001	; ????
+  44:	02 00       	.word	0x0002	; ????
+  46:	58 09       	sbc	r21, r8
+  48:	00 00       	nop
+  4a:	02 01       	movw	r0, r4
+  4c:	00 00       	nop
+  4e:	00 58       	subi	r16, 0x80	; 128
+  50:	09 00       	.word	0x0009	; ????
+  52:	00 02       	muls	r16, r16
+  54:	01 00       	.word	0x0001	; ????
 	...
